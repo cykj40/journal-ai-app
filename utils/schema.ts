@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, uuid, pgEnum, boolean } from 'drizzle-orm/pg-core';
+import { vectorEntries } from './vector-schema';
 
 // Define the enum for journal entry status
 export const journalEntryStatus = pgEnum('journal_entry_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
@@ -44,3 +45,4 @@ export const entryAnalysis = pgTable('entry_analysis', {
     sentimentScore: text('sentiment_score').notNull(),
 });
 
+export { vectorEntries }

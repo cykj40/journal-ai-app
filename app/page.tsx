@@ -1,9 +1,9 @@
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 export default async function Home() {
-  const { userId } = await auth();
-  let href = userId ? "/journal" : "/new-user";
+  const { userId } = auth();
+  const href = userId ? "/journal" : "/new-user";
 
   return (
     <div className="w-screen h-screen bg-black flex justify-center items-center text-white">
@@ -11,7 +11,7 @@ export default async function Home() {
         <h1 className="text-4xl font-bold mb-4">Turning reflections into revelations.</h1>
         <p className="text-2xl text-center mb-4">
           Every thought you pen down holds the power to spark new ideas and uncover hidden truths.
-          Journaling isn’t just about recording life; it’s about transforming the way you see it.
+          Journaling isn&apos;t just about recording life; it&apos;s about transforming the way you see it.
         </p>
         <div>
           <Link href={href}>
