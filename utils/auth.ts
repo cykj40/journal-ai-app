@@ -1,11 +1,11 @@
-import type { User } from '@clerk/nextjs/api'
+import type { User } from '@clerk/nextjs/server'
 import { db } from './db'
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { users, accounts } from './schema'
 import { eq } from 'drizzle-orm'
 
 export const getUserFromClerkID = async () => {
-    const { userId } = auth()
+    const { userId } = await auth()
 
     if (!userId) {
         throw new Error('No user ID found')
@@ -17,7 +17,21 @@ export const getUserFromClerkID = async () => {
         .where(eq(users.clerkId, userId))
 
     if (!user) {
-        throw new Error('User not found')
+        // Get the user data from Clerk
+        const clerkUser = await (await clerkClient()).users.getUser(userId)
+        // Sync the user to our database
+        await syncNewUser(clerkUser)
+        // Try to get the user again
+        const [newUser] = await db
+            .select()
+            .from(users)
+            .where(eq(users.clerkId, userId))
+
+        if (!newUser) {
+            throw new Error('Failed to create user')
+        }
+
+        return newUser
     }
 
     return user
