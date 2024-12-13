@@ -10,13 +10,11 @@ export const POST = async (request: Request) => {
     const user = await getUserFromClerkID()
 
     const entries = await db
-        .select({
-            content: journalEntries.content,
-            createdAt: journalEntries.createdAt
-        })
+        .select()
         .from(journalEntries)
         .where(eq(journalEntries.userId, user.id))
 
     const answer = await qa(question, entries)
+
     return NextResponse.json({ data: answer })
 }

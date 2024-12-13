@@ -12,8 +12,7 @@ const NewEntry = () => {
         try {
             setIsCreating(true)
             const { data } = await newEntry()
-            router.push(`/journal/${data.id}`)
-            router.refresh() // Refresh the page to show new entry
+            router.push(`/journal/${data.id}?new=true`)
         } catch (error) {
             console.error('Failed to create entry:', error)
         } finally {

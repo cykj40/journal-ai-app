@@ -3,7 +3,7 @@ import { updateEntry, deleteEntry } from '@/utils/api'
 import { useState } from 'react'
 import { useAutosave } from 'react-autosave'
 import Spinner from '@/components/Spinner'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 type Analysis = {
     mood: string
@@ -33,19 +33,27 @@ const Editor = ({ entry }: EditorProps) => {
     const [currentEntry, setEntry] = useState(entry)
     const [isSaving, setIsSaving] = useState(false)
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const isNewEntry = searchParams.get('new') === 'true'
 
     const handleDelete = async () => {
         await deleteEntry(entry.id)
         router.push('/journal')
     }
+
+    const handleSave = async () => {
+        setIsSaving(true)
+        await updateEntry(entry.id, { content: text })
+        router.push('/journal')
+        router.refresh()
+    }
+
     useAutosave({
         data: text,
         onSave: async (_text) => {
-            if (_text === entry.content) return
+            if (isNewEntry || _text === entry.content) return
             setIsSaving(true)
-
             const { data } = await updateEntry(entry.id, { content: _text })
-
             setEntry(data)
             setIsSaving(false)
         },
@@ -92,11 +100,22 @@ const Editor = ({ entry }: EditorProps) => {
                                 {currentEntry.analysis.negative ? 'True' : 'False'}
                             </div>
                         </li>
+                        {isNewEntry && (
+                            <li className="py-4 px-8 flex items-center justify-between">
+                                <button
+                                    onClick={handleSave}
+                                    type="button"
+                                    className="rounded-md bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-500"
+                                >
+                                    Save & Return
+                                </button>
+                            </li>
+                        )}
                         <li className="py-4 px-8 flex items-center justify-between">
                             <button
                                 onClick={handleDelete}
                                 type="button"
-                                className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                                className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
                             >
                                 Delete
                             </button>

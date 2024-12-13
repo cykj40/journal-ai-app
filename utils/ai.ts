@@ -1,4 +1,4 @@
-import { OpenAI } from '@langchain/openai'
+import { ChatOpenAI } from '@langchain/openai'
 import { PromptTemplate } from '@langchain/core/prompts'
 import { loadQARefineChain } from 'langchain/chains';
 import { NeonPostgres } from '@langchain/community/vectorstores/neon'
@@ -36,7 +36,7 @@ const parser = StructuredOutputParser.fromZodSchema(
     })
 )
 
-const getPrompt = async (content) => {
+const getPrompt = async (content: string) => {
     const format_instructions = parser.getFormatInstructions()
 
     const prompt = new PromptTemplate({
@@ -53,24 +53,27 @@ const getPrompt = async (content) => {
     return input
 }
 
-export const analyzeEntry = async (entry) => {
+export const analyzeEntry = async (entry: { id: string; userId: string; content: string; status: "DRAFT" | "PUBLISHED" | "ARCHIVED" | null; createdAt: Date; updatedAt: Date; }) => {
     const input = await getPrompt(entry.content)
-    const model = new OpenAI({ temperature: 0, modelName: 'gpt-3.5-turbo' })
-    const output = await model.call(input)
-
+    const model = new ChatOpenAI({
+        temperature: 0,
+        modelName: 'gpt-3.5-turbo',
+        maxTokens: 1000
+    })
+    const output = await model.invoke(input)
     try {
-        return parser.parse(output)
-    } catch (e) {
+        return parser.parse(output.content.toString())
+    } catch (error) {
         const fixParser = OutputFixingParser.fromLLM(
-            new OpenAI({ temperature: 0, modelName: 'gpt-3.5-turbo' }),
+            new ChatOpenAI({ temperature: 0, modelName: 'gpt-3.5-turbo' }),
             parser
         )
-        const fix = await fixParser.parse(output)
+        const fix = await fixParser.parse(output.content.toString())
         return fix
     }
 }
 
-export const qa = async (question, entries) => {
+export const qa = async (question: string, entries: { id: string; content: string; createdAt: Date }[]) => {
     const docs = entries.map(
         (entry) =>
             new Document({
@@ -78,7 +81,11 @@ export const qa = async (question, entries) => {
                 metadata: { source: entry.id, date: entry.createdAt },
             })
     )
-    const model = new OpenAI({ temperature: 0, modelName: 'gpt-3.5-turbo' })
+    const model = new ChatOpenAI({
+        temperature: 0,
+        modelName: 'gpt-3.5-turbo',
+        maxTokens: 1000
+    })
     const chain = loadQARefineChain(model)
     const embeddings = new OpenAIEmbeddings({
         dimensions: 256,
