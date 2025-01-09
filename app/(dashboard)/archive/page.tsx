@@ -4,17 +4,7 @@ import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq } from 'drizzle-orm'
 import Link from 'next/link'
 import EntryCard from '@/components/EntryCard'
-
-type EntryWithAnalysis = {
-    id: string;
-    content: string;
-    createdAt: Date;
-    analysis: {
-        mood: string;
-        color: string;
-        summary: string;
-    } | null;
-};
+import { type Entry } from '@/utils/types'
 
 const getArchivedEntries = async () => {
     const user = await getUserFromClerkID()
@@ -30,13 +20,25 @@ const getArchivedEntries = async () => {
         .orderBy(journalEntries.createdAt)
 
     return entries.map(entry => ({
-        ...entry.journal_entries,
-        analysis: entry.entry_analysis
-    }))
+        id: entry.journal_entries.id,
+        content: entry.journal_entries.content,
+        createdAt: entry.journal_entries.createdAt.toISOString(),
+        updatedAt: entry.journal_entries.updatedAt.toISOString(),
+        userId: entry.journal_entries.userId,
+        status: entry.journal_entries.status,
+        analysis: entry.entry_analysis || {
+            mood: '',
+            subject: '',
+            negative: false,
+            summary: '',
+            color: '',
+            sentimentScore: 0
+        }
+    })) as Entry[]
 }
 
-const groupEntriesByMonth = (entries: any[]) => {
-    return entries.reduce((acc, entry) => {
+const groupEntriesByMonth = (entries: Entry[]) => {
+    return entries.reduce<Record<string, Entry[]>>((acc, entry) => {
         const date = new Date(entry.createdAt)
         const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' })
 
@@ -46,14 +48,6 @@ const groupEntriesByMonth = (entries: any[]) => {
         acc[monthYear].push(entry)
         return acc
     }, {})
-}
-
-const ArchiveCard = ({ entry }: { entry: EntryWithAnalysis }) => {
-    return (
-        <Link key={entry.id} href={`/journal/${entry.id}`}>
-            <EntryCard entry={entry} />
-        </Link>
-    )
 }
 
 const ArchivePage = async () => {
@@ -68,8 +62,10 @@ const ArchivePage = async () => {
                     <div key={monthYear}>
                         <h2 className="text-2xl font-semibold mb-4">{monthYear}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {(monthEntries as any[]).map((entry) => (
-                                <ArchiveCard key={entry.id} entry={entry} />
+                            {monthEntries.map((entry) => (
+                                <Link key={entry.id} href={`/journal/${entry.id}`}>
+                                    <EntryCard entry={entry} />
+                                </Link>
                             ))}
                         </div>
                     </div>
