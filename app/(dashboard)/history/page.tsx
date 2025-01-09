@@ -2,26 +2,47 @@ import HistoryChart from "@/components/HistoryChart";
 import { getUserFromClerkID } from "@/utils/auth";
 import { db } from "@/utils/db";
 import { entryAnalysis } from "@/utils/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 const getData = async () => {
     const user = await getUserFromClerkID();
 
-    const analyses = await db.query.entryAnalysis.findMany({
-        where: eq(entryAnalysis.userId, user.id),
-        orderBy: [asc(entryAnalysis.createdAt)],
-    });
+    const analyses = await db
+        .select({
+            id: entryAnalysis.id,
+            mood: entryAnalysis.mood,
+            subject: entryAnalysis.subject,
+            negative: entryAnalysis.negative,
+            summary: entryAnalysis.summary,
+            color: entryAnalysis.color,
+            sentimentScore: entryAnalysis.sentimentScore,
+            updatedAt: entryAnalysis.updatedAt,
+            createdAt: entryAnalysis.createdAt
+        })
+        .from(entryAnalysis)
+        .where(eq(entryAnalysis.userId, user.id))
+        .orderBy(desc(entryAnalysis.createdAt));
 
     if (analyses.length === 0) {
         return { analyses: [], average: 0 };
     }
 
-    const total = analyses.reduce((acc, curr) => {
-        return acc + parseFloat(curr.sentimentScore);
+    const formattedAnalyses = analyses.map(analysis => ({
+        mood: analysis.mood,
+        subject: analysis.subject,
+        negative: analysis.negative,
+        summary: analysis.summary,
+        color: analysis.color || '#0101fe',
+        sentimentScore: parseFloat(analysis.sentimentScore),
+        updatedAt: analysis.updatedAt.toISOString()
+    }));
+
+    const total = formattedAnalyses.reduce((acc, curr) => {
+        return acc + curr.sentimentScore;
     }, 0);
 
     const average = total / analyses.length;
-    return { analyses, average };
+    return { analyses: formattedAnalyses, average };
 }
 
 const HistoryPage = async () => {
@@ -47,7 +68,7 @@ const HistoryPage = async () => {
                 <HistoryChart data={analyses} />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default HistoryPage;
