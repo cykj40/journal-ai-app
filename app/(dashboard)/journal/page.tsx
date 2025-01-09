@@ -1,3 +1,4 @@
+import { type Entry } from '@/utils/types'
 import { getUserFromClerkID } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
@@ -28,9 +29,28 @@ const getEntries = async () => {
         .orderBy(journalEntries.createdAt)
 
     return entries.map(entry => ({
-        ...entry.journal_entries,
-        analysis: entry.entry_analysis
-    }))
+        id: entry.journal_entries.id,
+        content: entry.journal_entries.content,
+        createdAt: entry.journal_entries.createdAt.toISOString(),
+        updatedAt: entry.journal_entries.updatedAt.toISOString(),
+        userId: entry.journal_entries.userId,
+        status: entry.journal_entries.status,
+        analysis: entry.entry_analysis ? {
+            mood: entry.entry_analysis.mood,
+            subject: entry.entry_analysis.subject,
+            negative: entry.entry_analysis.negative,
+            summary: entry.entry_analysis.summary,
+            color: entry.entry_analysis.color || '#0101fe',
+            sentimentScore: parseFloat(entry.entry_analysis.sentimentScore)
+        } : {
+            mood: '',
+            subject: '',
+            negative: false,
+            summary: '',
+            color: '#0101fe',
+            sentimentScore: 0
+        }
+    })) as Entry[]
 }
 
 const JournalPage = async () => {
