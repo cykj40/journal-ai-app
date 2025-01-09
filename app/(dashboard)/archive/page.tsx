@@ -5,6 +5,17 @@ import { eq } from 'drizzle-orm'
 import Link from 'next/link'
 import EntryCard from '@/components/EntryCard'
 
+type EntryWithAnalysis = {
+    id: string;
+    content: string;
+    createdAt: Date;
+    analysis: {
+        mood: string;
+        color: string;
+        summary: string;
+    } | null;
+};
+
 const getArchivedEntries = async () => {
     const user = await getUserFromClerkID()
 
@@ -37,6 +48,14 @@ const groupEntriesByMonth = (entries: any[]) => {
     }, {})
 }
 
+const ArchiveCard = ({ entry }: { entry: EntryWithAnalysis }) => {
+    return (
+        <Link key={entry.id} href={`/journal/${entry.id}`}>
+            <EntryCard entry={entry} />
+        </Link>
+    )
+}
+
 const ArchivePage = async () => {
     const entries = await getArchivedEntries()
     const entriesByMonth = groupEntriesByMonth(entries)
@@ -50,9 +69,7 @@ const ArchivePage = async () => {
                         <h2 className="text-2xl font-semibold mb-4">{monthYear}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {(monthEntries as any[]).map((entry) => (
-                                <Link key={entry.id} href={`/journal/${entry.id}`}>
-                                    <EntryCard entry={entry} />
-                                </Link>
+                                <ArchiveCard key={entry.id} entry={entry} />
                             ))}
                         </div>
                     </div>
