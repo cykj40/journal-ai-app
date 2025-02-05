@@ -1,58 +1,74 @@
+'use client'
+
 import { type Entry } from '@/utils/types'
 import Editor from '@/components/Editor'
-import { getUserFromClerkID } from '@/utils/auth'
-import { db } from '@/utils/db'
-import { journalEntries, entryAnalysis } from '@/utils/schema'
-import { eq, and } from 'drizzle-orm'
+import { useCallback, useEffect, useState } from 'react'
 
-const getEntry = async (id: string) => {
-    const user = await getUserFromClerkID()
-
-    const [entry] = await db
-        .select()
-        .from(journalEntries)
-        .where(
-            and(
-                eq(journalEntries.id, id),
-                eq(journalEntries.userId, user.id)
-            )
-        );
-
-    if (!entry) return null;
-
-    const [analysis] = await db
-        .select()
-        .from(entryAnalysis)
-        .where(eq(entryAnalysis.entryId, entry.id));
-
-    return {
-        id: entry.id,
-        content: entry.content,
-        createdAt: entry.createdAt.toISOString(),
-        updatedAt: entry.updatedAt.toISOString(),
-        userId: entry.userId,
-        status: entry.status,
-        analysis: {
-            mood: analysis?.mood || '',
-            subject: analysis?.subject || '',
-            negative: analysis?.negative || false,
-            summary: analysis?.summary || '',
-            color: analysis?.color || '#0101fe',
-            sentimentScore: analysis ? parseFloat(analysis.sentimentScore) : 0
-        }
-    } as Entry;
+interface Props {
+    params: { id: string }
 }
 
-const JournalEditorPage = async ({ params }: { params: { id: string } }) => {
-    const entry = await getEntry(params.id)
+const JournalEditorPage = ({ params }: Props) => {
+    const [entry, setEntry] = useState<Entry | null>(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const loadEntry = async () => {
+            try {
+                const response = await fetch(`/api/journal/${params.id}`)
+                if (!response.ok) {
+                    throw new Error('Failed to load entry')
+                }
+                const data = await response.json()
+                setEntry(data.data)
+            } catch (error) {
+                console.error('Error loading entry:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadEntry()
+    }, [params.id])
+
+    const saveEntry = useCallback(async (content: string) => {
+        try {
+            const response = await fetch(`/api/journal/${params.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ content }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to save entry')
+            }
+        } catch (error) {
+            console.error('Error saving entry:', error)
+            throw error
+        }
+    }, [params.id])
+
+    if (loading) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+        )
+    }
 
     if (!entry) {
-        return <div>Entry not found</div>
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <div className="text-gray-500">Entry not found</div>
+            </div>
+        )
     }
 
     return (
         <div className="w-full h-full">
-            <Editor entry={entry} />
+            <Editor entry={entry} onSave={saveEntry} />
         </div>
     )
 }
