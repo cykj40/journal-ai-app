@@ -3,6 +3,7 @@ import Link from "next/link";
 
 const links = [
     { name: "Current Month", href: "/journal" },
+    { name: "Analytics", href: "/analytics" },
     { name: "Past Entries", href: "/archive" },
     { name: "History", href: "/history" },
 ];
