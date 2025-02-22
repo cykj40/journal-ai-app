@@ -52,7 +52,6 @@ export default function AnalyticsDashboard({
     startDate: initialStartDate,
     endDate: initialEndDate,
 }: AnalyticsDashboardProps) {
-    const [dateRange, setDateRange] = useState<DateRange>('30d')
     const [startDate, setStartDate] = useState<Date>(initialStartDate)
     const [endDate, setEndDate] = useState<Date>(initialEndDate)
     const [comparison, setComparison] = useState<TimeComparison>('none')
@@ -162,7 +161,9 @@ export default function AnalyticsDashboard({
     return (
         <div>
             <DateRangeFilter
-                onRangeChange={setDateRange}
+                onRangeChange={(range) => {
+                    // Handle range change
+                }}
                 onDateChange={(start, end) => {
                     if (start && end) {
                         setStartDate(start)

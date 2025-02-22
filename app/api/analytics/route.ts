@@ -4,7 +4,24 @@ import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and, between, desc } from 'drizzle-orm'
 
-type AnalyticsData = Awaited<ReturnType<typeof db.select>>
+type AnalyticsData = Awaited<ReturnType<typeof getAnalyticsData>>
+
+async function getAnalyticsData(startDate: Date, endDate: Date, userId: string) {
+    return db
+        .select()
+        .from(journalEntries)
+        .leftJoin(
+            entryAnalysis,
+            eq(journalEntries.id, entryAnalysis.entryId)
+        )
+        .where(
+            and(
+                eq(journalEntries.userId, userId),
+                between(journalEntries.createdAt, startDate, endDate)
+            )
+        )
+        .orderBy(desc(journalEntries.createdAt))
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -16,20 +33,7 @@ export async function GET(request: NextRequest) {
         const user = await getUserFromClerkID()
 
         // Get current period data
-        const currentPeriodData = await db
-            .select()
-            .from(journalEntries)
-            .leftJoin(
-                entryAnalysis,
-                eq(journalEntries.id, entryAnalysis.entryId)
-            )
-            .where(
-                and(
-                    eq(journalEntries.userId, user.id),
-                    between(journalEntries.createdAt, startDate, endDate)
-                )
-            )
-            .orderBy(desc(journalEntries.createdAt))
+        const currentPeriodData = await getAnalyticsData(startDate, endDate, user.id)
 
         // If comparison is requested, get previous period data
         let previousPeriodData: AnalyticsData = []
@@ -38,20 +42,7 @@ export async function GET(request: NextRequest) {
             const previousStartDate = new Date(startDate.getTime() - duration)
             const previousEndDate = new Date(endDate.getTime() - duration)
 
-            previousPeriodData = await db
-                .select()
-                .from(journalEntries)
-                .leftJoin(
-                    entryAnalysis,
-                    eq(journalEntries.id, entryAnalysis.entryId)
-                )
-                .where(
-                    and(
-                        eq(journalEntries.userId, user.id),
-                        between(journalEntries.createdAt, previousStartDate, previousEndDate)
-                    )
-                )
-                .orderBy(desc(journalEntries.createdAt))
+            previousPeriodData = await getAnalyticsData(previousStartDate, previousEndDate, user.id)
         }
 
         return NextResponse.json({

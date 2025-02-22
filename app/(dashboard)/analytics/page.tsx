@@ -25,30 +25,6 @@ const getAnalyticsData = async (startDate: Date, endDate: Date) => {
     return entries
 }
 
-const getPreviousPeriodData = async (startDate: Date, endDate: Date) => {
-    const user = await getUserFromClerkID()
-    const duration = endDate.getTime() - startDate.getTime()
-    const previousStartDate = new Date(startDate.getTime() - duration)
-    const previousEndDate = new Date(endDate.getTime() - duration)
-
-    const entries = await db
-        .select()
-        .from(journalEntries)
-        .leftJoin(
-            entryAnalysis,
-            eq(journalEntries.id, entryAnalysis.entryId)
-        )
-        .where(
-            and(
-                eq(journalEntries.userId, user.id),
-                between(journalEntries.createdAt, previousStartDate, previousEndDate)
-            )
-        )
-        .orderBy(desc(journalEntries.createdAt))
-
-    return entries
-}
-
 export default async function AnalyticsPage() {
     // Default to last 30 days
     const endDate = new Date()

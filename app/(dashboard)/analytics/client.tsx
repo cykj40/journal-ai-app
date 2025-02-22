@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DateRange, TimeComparison } from '@/components/DateRangeFilter'
+import { TimeComparison } from '@/components/DateRangeFilter'
 import AnalyticsDashboard from '@/components/AnalyticsDashboard'
 
 interface ClientAnalyticsProps {
@@ -17,31 +17,6 @@ export default function ClientAnalytics({
 }: ClientAnalyticsProps) {
     const [data, setData] = useState(initialData)
     const [isLoading, setIsLoading] = useState(false)
-
-    const handleDateChange = async (
-        startDate: Date | null,
-        endDate: Date | null,
-        comparison: TimeComparison = 'none'
-    ) => {
-        if (!startDate || !endDate) return
-
-        setIsLoading(true)
-        try {
-            const params = new URLSearchParams({
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-                comparison,
-            })
-
-            const response = await fetch(`/api/analytics?${params}`)
-            const newData = await response.json()
-            setData(newData)
-        } catch (error) {
-            console.error('Failed to fetch analytics data:', error)
-        } finally {
-            setIsLoading(false)
-        }
-    }
 
     return (
         <div className="h-full p-8">
