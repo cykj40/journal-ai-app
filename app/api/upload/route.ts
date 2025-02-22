@@ -4,11 +4,9 @@ import { join } from 'path'
 import { getUserFromClerkID } from '@/utils/auth'
 import sharp from 'sharp'
 
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-}
+// New Next.js 14 route segment config
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
     try {
