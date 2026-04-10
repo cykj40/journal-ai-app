@@ -48,10 +48,10 @@ const Editor = ({ entry, onSave, isNew = false }: EditorProps) => {
     const dateLabel = formatEntryDate(entry.createdAt)
 
     return (
-        <div className="relative w-full h-full overflow-y-auto bg-gray-50">
-            <div className="mx-auto w-full max-w-[680px] min-h-full bg-white px-10 py-16 shadow-sm">
+        <div className="relative w-full h-full overflow-y-auto bg-gray-50 dark:bg-zinc-950">
+            <div className="mx-auto w-full max-w-[680px] min-h-full bg-white dark:bg-zinc-900 px-10 py-16 shadow-sm">
                 {dateLabel && (
-                    <p className="mb-8 text-sm tracking-wide text-gray-400 font-sans select-none">
+                    <p className="mb-8 text-sm tracking-wide text-gray-400 dark:text-zinc-500 font-sans select-none">
                         {dateLabel}
                     </p>
                 )}
@@ -73,7 +73,7 @@ const Editor = ({ entry, onSave, isNew = false }: EditorProps) => {
                 />
             </div>
 
-            <div className="fixed bottom-5 right-6 text-xs text-gray-400 select-none pointer-events-none transition-opacity duration-300">
+            <div className="fixed bottom-5 right-6 text-xs text-gray-400 dark:text-zinc-600 select-none pointer-events-none transition-opacity duration-300">
                 {isSaving ? 'Saving...' : 'Saved'}
             </div>
         </div>

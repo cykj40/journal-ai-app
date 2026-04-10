@@ -20,7 +20,7 @@ function StarRow({
 }) {
     return (
         <div className="flex items-center gap-3">
-            <span className="w-14 text-xs text-gray-500 shrink-0">{label}</span>
+            <span className="w-14 text-xs text-gray-500 dark:text-zinc-400 shrink-0">{label}</span>
             <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map(n => (
                     <button
@@ -31,7 +31,7 @@ function StarRow({
                         title={`${label} ${n}`}
                     >
                         <svg
-                            className={`w-5 h-5 ${n <= value ? 'text-violet-500' : 'text-gray-200'}`}
+                            className={`w-5 h-5 ${n <= value ? 'text-violet-500' : 'text-gray-200 dark:text-zinc-700'}`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                         >
@@ -79,7 +79,7 @@ const HealthSnapshotWidget = ({ entryId }: HealthSnapshotProps) => {
 
     if (saved) {
         return (
-            <div className="mb-6 flex items-center gap-2 text-xs text-gray-400">
+            <div className="mb-6 flex items-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
                 <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
@@ -89,8 +89,8 @@ const HealthSnapshotWidget = ({ entryId }: HealthSnapshotProps) => {
     }
 
     return (
-        <div className="mb-8 rounded-xl border border-gray-100 bg-gray-50/80 px-5 py-4">
-            <p className="text-xs font-medium text-gray-400 mb-4 tracking-wide uppercase">
+        <div className="mb-8 rounded-xl border border-gray-100 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-800/40 px-5 py-4">
+            <p className="text-xs font-medium text-gray-400 dark:text-zinc-500 mb-4 tracking-wide uppercase">
                 Quick check-in
             </p>
 
@@ -99,7 +99,7 @@ const HealthSnapshotWidget = ({ entryId }: HealthSnapshotProps) => {
                 <StarRow label="Stress" value={stress} onChange={setStress} />
 
                 <div className="flex items-center gap-3">
-                    <span className="w-14 text-xs text-gray-500 shrink-0">Sleep</span>
+                    <span className="w-14 text-xs text-gray-500 dark:text-zinc-400 shrink-0">Sleep</span>
                     <div className="flex items-center gap-1.5">
                         <input
                             type="number"
@@ -109,14 +109,14 @@ const HealthSnapshotWidget = ({ entryId }: HealthSnapshotProps) => {
                             value={sleepHours}
                             onChange={e => setSleepHours(e.target.value)}
                             placeholder="7.5"
-                            className="w-16 px-2 py-1 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-violet-300 text-center"
+                            className="w-16 px-2 py-1 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-700 text-center"
                         />
-                        <span className="text-xs text-gray-400">hrs</span>
+                        <span className="text-xs text-gray-400 dark:text-zinc-500">hrs</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="w-14 text-xs text-gray-500 shrink-0">Mood</span>
+                    <span className="w-14 text-xs text-gray-500 dark:text-zinc-400 shrink-0">Mood</span>
                     <div className="flex gap-1.5">
                         {MOOD_OPTIONS.map(emoji => (
                             <button
@@ -124,7 +124,9 @@ const HealthSnapshotWidget = ({ entryId }: HealthSnapshotProps) => {
                                 type="button"
                                 onClick={() => setMood(emoji === mood ? '' : emoji)}
                                 className={`text-xl transition-all hover:scale-110 focus:outline-none rounded-lg p-0.5 ${
-                                    mood === emoji ? 'ring-2 ring-violet-400 bg-violet-50' : 'opacity-60 hover:opacity-100'
+                                    mood === emoji
+                                        ? 'ring-2 ring-violet-400 bg-violet-50 dark:bg-violet-900/30'
+                                        : 'opacity-60 hover:opacity-100'
                                 }`}
                                 title={emoji}
                             >

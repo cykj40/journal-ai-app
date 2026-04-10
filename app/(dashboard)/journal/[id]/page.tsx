@@ -112,7 +112,7 @@ const JournalEditorPage = () => {
     if (!entry) {
         return (
             <div className="w-full h-full flex items-center justify-center">
-                <div className="text-gray-400 text-sm">Entry not found</div>
+                <div className="text-gray-400 dark:text-zinc-500 text-sm">Entry not found</div>
             </div>
         )
     }
@@ -125,7 +125,7 @@ const JournalEditorPage = () => {
             </div>
 
             {/* AI Sidebar — hidden below lg */}
-            <aside className="hidden lg:flex w-[300px] shrink-0 flex-col border-l border-gray-100 overflow-y-auto bg-white">
+            <aside className="hidden lg:flex w-[300px] shrink-0 flex-col border-l border-gray-100 dark:border-zinc-800 overflow-y-auto bg-white dark:bg-zinc-900">
                 <AISidebar
                     entryId={entryId}
                     analysis={analysis ?? entry.analysis}

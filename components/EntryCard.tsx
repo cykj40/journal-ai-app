@@ -32,15 +32,15 @@ const EntryCard = ({ entry }: EntryCardProps) => {
     }
 
     return (
-        <div className="relative flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-50 group transition-colors cursor-pointer">
+        <div className="relative flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800/60 group transition-colors cursor-pointer">
             {isDeleting && (
-                <div className="absolute inset-0 bg-white/70 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-gray-400">Deleting...</span>
+                <div className="absolute inset-0 bg-white/70 dark:bg-zinc-900/70 rounded-lg flex items-center justify-center">
+                    <span className="text-xs text-gray-400 dark:text-zinc-500">Deleting...</span>
                 </div>
             )}
 
             {/* Date */}
-            <span className="w-[52px] shrink-0 text-xs text-gray-400 font-sans tabular-nums">
+            <span className="w-[52px] shrink-0 text-xs text-gray-400 dark:text-zinc-500 font-sans tabular-nums">
                 {shortDate}
             </span>
 
@@ -51,13 +51,13 @@ const EntryCard = ({ entry }: EntryCardProps) => {
             />
 
             {/* Summary */}
-            <p className="flex-1 text-sm text-gray-600 truncate min-w-0">
+            <p className="flex-1 text-sm text-gray-600 dark:text-zinc-400 truncate min-w-0">
                 {entry.analysis.summary || 'No summary yet'}
             </p>
 
             {/* Mood + score badge */}
             {entry.analysis.mood && (
-                <span className="shrink-0 text-xs text-gray-400 font-sans whitespace-nowrap">
+                <span className="shrink-0 text-xs text-gray-400 dark:text-zinc-500 font-sans whitespace-nowrap">
                     {entry.analysis.mood}{score ? ` · ${score}` : ''}
                 </span>
             )}

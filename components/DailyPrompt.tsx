@@ -28,19 +28,19 @@ const DailyPrompt = ({ onInsert }: DailyPromptProps) => {
     }
 
     return (
-        <div className="mb-8 rounded-xl border border-violet-100 bg-violet-50/60 px-5 py-4">
+        <div className="mb-8 rounded-xl border border-violet-100 dark:border-violet-900/40 bg-violet-50/60 dark:bg-violet-950/20 px-5 py-4">
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-violet-500 mb-1.5 tracking-wide uppercase">
                         Today's prompt
                     </p>
-                    <p className="text-sm italic text-gray-600 leading-relaxed">
+                    <p className="text-sm italic text-gray-600 dark:text-zinc-300 leading-relaxed">
                         {prompt}
                     </p>
                 </div>
                 <button
                     onClick={() => setDismissed(true)}
-                    className="shrink-0 text-gray-300 hover:text-gray-500 transition-colors mt-0.5"
+                    className="shrink-0 text-gray-300 dark:text-zinc-600 hover:text-gray-500 dark:hover:text-zinc-400 transition-colors mt-0.5"
                     title="Dismiss"
                 >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -57,7 +57,7 @@ const DailyPrompt = ({ onInsert }: DailyPromptProps) => {
                     Use this prompt →
                 </button>
             ) : (
-                <p className="mt-3 text-xs text-gray-400">Prompt inserted. Start writing below.</p>
+                <p className="mt-3 text-xs text-gray-400 dark:text-zinc-500">Prompt inserted. Start writing below.</p>
             )}
         </div>
     )

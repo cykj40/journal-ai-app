@@ -133,7 +133,7 @@ function RichTextEditor({ content, onChange, placeholder = 'Start writing...' },
         content,
         editorProps: {
             attributes: {
-                class: 'prose prose-lg max-w-none focus:outline-none min-h-[60vh] font-serif text-gray-900 leading-relaxed',
+                class: 'prose prose-lg dark:prose-invert max-w-none focus:outline-none min-h-[60vh] font-serif text-gray-900 dark:text-zinc-100 leading-relaxed',
             },
         },
         onUpdate: ({ editor }: { editor: Editor }) => {

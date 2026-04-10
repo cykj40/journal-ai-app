@@ -74,14 +74,14 @@ const JournalPage = async () => {
     const groups = groupByDay(entries)
 
     return (
-        <div className="relative h-full overflow-y-auto bg-gray-50">
+        <div className="relative h-full overflow-y-auto bg-gray-50 dark:bg-zinc-950">
             <div className="mx-auto max-w-[680px] px-6 py-10">
-                <h1 className="text-xl font-semibold text-gray-800 mb-6">
+                <h1 className="text-xl font-semibold text-gray-800 dark:text-zinc-100 mb-6">
                     {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </h1>
 
                 {entries.length === 0 ? (
-                    <p className="text-sm text-gray-400 mt-16 text-center">
+                    <p className="text-sm text-gray-400 dark:text-zinc-500 mt-16 text-center">
                         No entries this month yet.
                     </p>
                 ) : (
@@ -91,10 +91,10 @@ const JournalPage = async () => {
                                 {/* Date divider — only shown when a day has multiple entries */}
                                 {dayEntries.length > 1 && (
                                     <div className="flex items-center gap-3 px-3 py-2 mt-4 first:mt-0">
-                                        <span className="text-xs font-medium text-gray-400 tracking-wide">
+                                        <span className="text-xs font-medium text-gray-400 dark:text-zinc-500 tracking-wide">
                                             {dayLabel}
                                         </span>
-                                        <div className="flex-1 h-px bg-gray-200" />
+                                        <div className="flex-1 h-px bg-gray-200 dark:bg-zinc-700" />
                                     </div>
                                 )}
 
