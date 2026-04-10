@@ -6,24 +6,26 @@ import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
-export const DELETE = async (request: Request, { params }: { params: { id: string } }) => {
+export const DELETE = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params
     const user = await getUserFromClerkID()
 
     await db
         .delete(journalEntries)
         .where(
             and(
-                eq(journalEntries.id, params.id),
+                eq(journalEntries.id, id),
                 eq(journalEntries.userId, user.id)
             )
         )
 
     update(['/journal'])
 
-    return NextResponse.json({ data: { id: params.id } })
+    return NextResponse.json({ data: { id } })
 }
 
-export const PATCH = async (request: Request, { params }: { params: { id: string } }) => {
+export const PATCH = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params
     const { updates } = await request.json()
     const user = await getUserFromClerkID()
 
@@ -32,7 +34,7 @@ export const PATCH = async (request: Request, { params }: { params: { id: string
         .set(updates)
         .where(
             and(
-                eq(journalEntries.id, params.id),
+                eq(journalEntries.id, id),
                 eq(journalEntries.userId, user.id)
             )
         )

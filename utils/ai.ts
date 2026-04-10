@@ -1,14 +1,14 @@
 import { ChatOpenAI } from '@langchain/openai'
 import { PromptTemplate } from '@langchain/core/prompts'
-import { loadQARefineChain } from 'langchain/chains';
+import { loadQARefineChain } from '@langchain/classic/chains'
 import { NeonPostgres } from '@langchain/community/vectorstores/neon'
 import { OpenAIEmbeddings } from '@langchain/openai'
 
 import {
     StructuredOutputParser,
     OutputFixingParser,
-} from 'langchain/output_parsers'
-import { Document } from 'langchain/document'
+} from '@langchain/classic/output_parsers'
+import { Document } from '@langchain/core/documents'
 import { z } from 'zod'
 
 const parser = StructuredOutputParser.fromZodSchema(

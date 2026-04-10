@@ -3,19 +3,22 @@
 import { type Entry } from '@/utils/types'
 import Editor from '@/components/Editor'
 import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 
-interface Props {
-    params: { id: string }
-}
-
-const JournalEditorPage = ({ params }: Props) => {
+const JournalEditorPage = () => {
+    const params = useParams<{ id: string }>()
+    const entryId = params.id
     const [entry, setEntry] = useState<Entry | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        if (!entryId) {
+            return
+        }
+
         const loadEntry = async () => {
             try {
-                const response = await fetch(`/api/journal/${params.id}`)
+                const response = await fetch(`/api/journal/${entryId}`)
                 if (!response.ok) {
                     throw new Error('Failed to load entry')
                 }
@@ -29,11 +32,11 @@ const JournalEditorPage = ({ params }: Props) => {
         }
 
         loadEntry()
-    }, [params.id])
+    }, [entryId])
 
     const saveEntry = useCallback(async (content: string) => {
         try {
-            const response = await fetch(`/api/journal/${params.id}`, {
+            const response = await fetch(`/api/journal/${entryId}`, {
                 method: 'PATCH',
                 body: JSON.stringify({ content }),
                 headers: {
@@ -48,7 +51,7 @@ const JournalEditorPage = ({ params }: Props) => {
             console.error('Error saving entry:', error)
             throw error
         }
-    }, [params.id])
+    }, [entryId])
 
     if (loading) {
         return (
@@ -74,5 +77,4 @@ const JournalEditorPage = ({ params }: Props) => {
 }
 
 export default JournalEditorPage
-
 

@@ -6,9 +6,10 @@ import { eq, and } from 'drizzle-orm'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await getUserFromClerkID()
 
         const [entry] = await db
@@ -16,7 +17,7 @@ export async function GET(
             .from(journalEntries)
             .where(
                 and(
-                    eq(journalEntries.id, params.id),
+                    eq(journalEntries.id, id),
                     eq(journalEntries.userId, user.id)
                 )
             )
@@ -62,9 +63,10 @@ export async function GET(
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const user = await getUserFromClerkID()
         const { content } = await request.json()
 
@@ -83,7 +85,7 @@ export async function PATCH(
             })
             .where(
                 and(
-                    eq(journalEntries.id, params.id),
+                    eq(journalEntries.id, id),
                     eq(journalEntries.userId, user.id)
                 )
             )

@@ -2,6 +2,6 @@
 
 import { revalidatePath } from 'next/cache';
 
-export const update = (paths: string[]) => {
+export const update = async (paths: string[]) => {
     paths.forEach(path => revalidatePath(path))
 }
