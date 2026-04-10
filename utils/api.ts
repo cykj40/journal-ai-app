@@ -22,7 +22,7 @@ export const newEntry = async () => {
         new Request(createURL('/api/entry'), {
             method: 'POST',
             body: JSON.stringify({
-                content: 'new entry',
+                content: '',
                 status: 'DRAFT'
             }),
         })

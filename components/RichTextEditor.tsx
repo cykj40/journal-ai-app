@@ -7,7 +7,7 @@ import { Color } from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
 import Placeholder from '@tiptap/extension-placeholder'
 import Image from '@tiptap/extension-image'
-import { useCallback, useState, useRef, forwardRef, useImperativeHandle } from 'react'
+import { useCallback, useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import { useDropzone } from 'react-dropzone'
 import ReactCrop, { Crop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
@@ -15,6 +15,7 @@ import NextImage from 'next/image'
 
 export interface RichTextEditorHandle {
     insertContent: (text: string) => void
+    setContent: (content: string) => void
 }
 
 interface RichTextEditorProps {
@@ -145,7 +146,19 @@ function RichTextEditor({ content, onChange, placeholder = 'Start writing...' },
         insertContent: (text: string) => {
             editor?.chain().focus().insertContent(text).run()
         },
+        setContent: (nextContent: string) => {
+            editor?.commands.setContent(nextContent, false)
+        },
     }), [editor])
+
+    useEffect(() => {
+        if (!editor) return
+
+        const currentContent = editor.getHTML()
+        if (content !== currentContent) {
+            editor.commands.setContent(content, false)
+        }
+    }, [content, editor])
 
     const handleImageUpload = useCallback(async (file: File) => {
         const imageUrl = URL.createObjectURL(file)
