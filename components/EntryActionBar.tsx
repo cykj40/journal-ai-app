@@ -1,5 +1,7 @@
 'use client'
 
+import MicButton from './MicButton'
+
 interface EntryActionBarProps {
     entryId: string | null
     isSaving: boolean
@@ -8,6 +10,12 @@ interface EntryActionBarProps {
     onDelete: () => void
     onNew: () => void
     onDiscard: () => void
+    // Voice dictation
+    isRecording?: boolean
+    isTranscribing?: boolean
+    onMicStart?: () => void
+    onMicStop?: () => void
+    micError?: string | null
 }
 
 const baseButtonClassName =
@@ -21,17 +29,38 @@ const EntryActionBar = ({
     onDelete,
     onNew,
     onDiscard,
+    isRecording = false,
+    isTranscribing = false,
+    onMicStart,
+    onMicStop,
+    micError,
 }: EntryActionBarProps) => {
     return (
         <div className="sticky bottom-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
+            {micError && (
+                <div className="mx-auto w-full max-w-[680px] px-10 pt-2">
+                    <p className="text-xs text-red-500 dark:text-red-400">{micError}</p>
+                </div>
+            )}
             <div className="mx-auto flex w-full max-w-[680px] items-center justify-between gap-3 px-10 py-4">
-                <button
-                    type="button"
-                    onClick={onNew}
-                    className={`${baseButtonClassName} border border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800`}
-                >
-                    New Entry
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={onNew}
+                        className={`${baseButtonClassName} border border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800`}
+                    >
+                        New Entry
+                    </button>
+
+                    {onMicStart && onMicStop && (
+                        <MicButton
+                            isRecording={isRecording}
+                            isTranscribing={isTranscribing}
+                            onStart={onMicStart}
+                            onStop={onMicStop}
+                        />
+                    )}
+                </div>
 
                 <div className="flex items-center gap-3">
                     {isDirty && (

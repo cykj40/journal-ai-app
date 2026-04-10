@@ -26,12 +26,19 @@ const getArchivedEntries = async () => {
         updatedAt: entry.journal_entries.updatedAt.toISOString(),
         userId: entry.journal_entries.userId,
         status: entry.journal_entries.status,
-        analysis: entry.entry_analysis || {
+        analysis: entry.entry_analysis ? {
+            mood: entry.entry_analysis.mood,
+            subject: entry.entry_analysis.subject,
+            negative: entry.entry_analysis.negative,
+            summary: entry.entry_analysis.summary,
+            color: entry.entry_analysis.color || '#6366f1',
+            sentimentScore: parseFloat(entry.entry_analysis.sentimentScore)
+        } : {
             mood: '',
             subject: '',
             negative: false,
             summary: '',
-            color: '',
+            color: '#6366f1',
             sentimentScore: 0
         }
     })) as Entry[]

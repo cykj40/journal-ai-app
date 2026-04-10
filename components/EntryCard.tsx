@@ -18,9 +18,10 @@ const EntryCard = ({ entry }: EntryCardProps) => {
         day: 'numeric',
     })
 
-    const score = entry.analysis.sentimentScore
-        ? entry.analysis.sentimentScore.toFixed(1)
+    const rawScore = entry.analysis?.sentimentScore != null
+        ? Number(entry.analysis.sentimentScore)
         : null
+    const score = rawScore !== null && !isNaN(rawScore) ? rawScore.toFixed(1) : null
 
     const handleDelete = async (e: React.MouseEvent) => {
         e.preventDefault()

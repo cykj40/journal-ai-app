@@ -1,9 +1,10 @@
 'use client'
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import RichTextEditor, { type RichTextEditorHandle } from './RichTextEditor'
 import DailyPrompt from './DailyPrompt'
 import HealthSnapshot from './HealthSnapshot'
 import EntryActionBar from './EntryActionBar'
+import { useVoiceDictation } from '@/hooks/useVoiceDictation'
 
 interface EditorProps {
     entry: {
@@ -45,6 +46,18 @@ const Editor = ({
 }: EditorProps) => {
     const editorRef = useRef<RichTextEditorHandle>(null)
 
+    const handleTranscript = useCallback((text: string) => {
+        editorRef.current?.insertContent(text + ' ')
+    }, [])
+
+    const {
+        isRecording,
+        isTranscribing,
+        startRecording,
+        stopRecording,
+        error: micError,
+    } = useVoiceDictation(handleTranscript)
+
     const dateLabel = formatEntryDate(entry.createdAt)
 
     return (
@@ -81,6 +94,11 @@ const Editor = ({
                 onDelete={onDelete}
                 onNew={onNew}
                 onDiscard={onDiscard}
+                isRecording={isRecording}
+                isTranscribing={isTranscribing}
+                onMicStart={startRecording}
+                onMicStop={stopRecording}
+                micError={micError}
             />
 
             <div className="absolute bottom-24 right-6 text-xs text-gray-400 dark:text-zinc-600 select-none pointer-events-none transition-opacity duration-300">
