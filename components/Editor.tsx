@@ -1,14 +1,18 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAutosave } from 'react-autosave'
-import RichTextEditor from './RichTextEditor'
+import RichTextEditor, { type RichTextEditorHandle } from './RichTextEditor'
+import DailyPrompt from './DailyPrompt'
+import HealthSnapshot from './HealthSnapshot'
 
 interface EditorProps {
     entry: {
+        id: string
         content: string
         createdAt?: string
     }
     onSave: (content: string) => Promise<void>
+    isNew?: boolean
 }
 
 function formatEntryDate(dateStr?: string): string {
@@ -21,9 +25,10 @@ function formatEntryDate(dateStr?: string): string {
     })
 }
 
-const Editor = ({ entry, onSave }: EditorProps) => {
+const Editor = ({ entry, onSave, isNew = false }: EditorProps) => {
     const [value, setValue] = useState(entry.content)
     const [isSaving, setIsSaving] = useState(false)
+    const editorRef = useRef<RichTextEditorHandle>(null)
 
     useAutosave({
         data: value,
@@ -50,7 +55,18 @@ const Editor = ({ entry, onSave }: EditorProps) => {
                         {dateLabel}
                     </p>
                 )}
+
+                {isNew && (
+                    <>
+                        <HealthSnapshot entryId={entry.id} />
+                        <DailyPrompt
+                            onInsert={(text) => editorRef.current?.insertContent(text)}
+                        />
+                    </>
+                )}
+
                 <RichTextEditor
+                    ref={editorRef}
                     content={value}
                     onChange={setValue}
                     placeholder="Write your thoughts here..."

@@ -98,9 +98,13 @@ export const qa = async (question: string, entries: { id: string; content: strin
 
     await vectorStore.addDocuments(docs)
     const relevantDocs = await vectorStore.similaritySearch(question)
+    const healthAwareQuestion =
+        'You are a health and mood journal coach. Answer questions about mood, energy, stress, sleep, and physical symptoms based on the journal entries provided. ' +
+        question
+
     const res = await chain.call({
         input_documents: relevantDocs,
-        question,
+        question: healthAwareQuestion,
     })
 
     return res.output_text

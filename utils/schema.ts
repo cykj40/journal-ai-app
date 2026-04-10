@@ -21,6 +21,7 @@ export const journalEntries = pgTable('journal_entries', {
     userId: uuid('user_id').notNull().references(() => users.id),
     content: text('content').notNull(),
     status: journalEntryStatusEnum('status').default('DRAFT'),
+    healthSnapshot: text('health_snapshot'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })

@@ -7,11 +7,15 @@ import { Color } from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
 import Placeholder from '@tiptap/extension-placeholder'
 import Image from '@tiptap/extension-image'
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { useDropzone } from 'react-dropzone'
 import ReactCrop, { Crop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import NextImage from 'next/image'
+
+export interface RichTextEditorHandle {
+    insertContent: (text: string) => void
+}
 
 interface RichTextEditorProps {
     content: string
@@ -113,7 +117,8 @@ const ImageCropDialog = ({ imageUrl, onCrop, onCancel }: ImageCropDialogProps) =
     )
 }
 
-const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' }: RichTextEditorProps) => {
+const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(
+function RichTextEditor({ content, onChange, placeholder = 'Start writing...' }, ref) {
     const [cropImage, setCropImage] = useState<string | null>(null)
 
     const editor = useEditor({
@@ -135,6 +140,12 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' }:
             onChange(editor.getHTML())
         },
     })
+
+    useImperativeHandle(ref, () => ({
+        insertContent: (text: string) => {
+            editor?.chain().focus().insertContent(text).run()
+        },
+    }), [editor])
 
     const handleImageUpload = useCallback(async (file: File) => {
         const imageUrl = URL.createObjectURL(file)
@@ -247,7 +258,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start writing...' }:
             </div>
         </div>
     )
-}
+})
 
 function BubbleButton({
     onClick,

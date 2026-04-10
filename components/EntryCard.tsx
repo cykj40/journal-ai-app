@@ -12,10 +12,18 @@ interface EntryCardProps {
 const EntryCard = ({ entry }: EntryCardProps) => {
     const router = useRouter()
     const [isDeleting, setIsDeleting] = useState(false)
-    const date = new Date(entry.createdAt).toDateString()
+
+    const shortDate = new Date(entry.createdAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+    })
+
+    const score = entry.analysis.sentimentScore
+        ? entry.analysis.sentimentScore.toFixed(1)
+        : null
 
     const handleDelete = async (e: React.MouseEvent) => {
-        e.preventDefault() // Prevent navigation
+        e.preventDefault()
         if (confirm('Are you sure you want to delete this entry?')) {
             setIsDeleting(true)
             await deleteEntry(entry.id)
@@ -24,23 +32,44 @@ const EntryCard = ({ entry }: EntryCardProps) => {
     }
 
     return (
-        <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow relative group">
+        <div className="relative flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-50 group transition-colors cursor-pointer">
             {isDeleting && (
-                <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                    <span>Deleting...</span>
+                <div className="absolute inset-0 bg-white/70 rounded-lg flex items-center justify-center">
+                    <span className="text-xs text-gray-400">Deleting...</span>
                 </div>
             )}
-            <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-                <span>{date}</span>
-                <button
-                    onClick={handleDelete}
-                    className="opacity-0 group-hover:opacity-100 text-red-600 hover:text-red-800 transition-opacity"
-                >
-                    Delete
-                </button>
-            </div>
-            <div className="px-4 py-5 sm:p-6">{entry.analysis.summary}</div>
-            <div className="px-4 py-4 sm:px-6">{entry.analysis.mood}</div>
+
+            {/* Date */}
+            <span className="w-[52px] shrink-0 text-xs text-gray-400 font-sans tabular-nums">
+                {shortDate}
+            </span>
+
+            {/* Color dot */}
+            <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: entry.analysis.color || '#6366f1' }}
+            />
+
+            {/* Summary */}
+            <p className="flex-1 text-sm text-gray-600 truncate min-w-0">
+                {entry.analysis.summary || 'No summary yet'}
+            </p>
+
+            {/* Mood + score badge */}
+            {entry.analysis.mood && (
+                <span className="shrink-0 text-xs text-gray-400 font-sans whitespace-nowrap">
+                    {entry.analysis.mood}{score ? ` · ${score}` : ''}
+                </span>
+            )}
+
+            {/* Delete */}
+            <button
+                onClick={handleDelete}
+                className="shrink-0 opacity-0 group-hover:opacity-100 text-xs text-red-400 hover:text-red-600 transition-opacity"
+                title="Delete entry"
+            >
+                ✕
+            </button>
         </div>
     )
 }

@@ -41,6 +41,7 @@ export async function GET(
             updatedAt: entry.updatedAt.toISOString(),
             userId: entry.userId,
             status: entry.status,
+            healthSnapshot: entry.healthSnapshot ?? undefined,
             analysis: {
                 mood: analysis?.mood || '',
                 subject: analysis?.subject || '',
@@ -68,11 +69,12 @@ export async function PATCH(
     try {
         const { id } = await params
         const user = await getUserFromClerkID()
-        const { content } = await request.json()
+        const body = await request.json()
+        const { content, healthSnapshot } = body
 
-        if (!content) {
+        if (content === undefined && healthSnapshot === undefined) {
             return NextResponse.json(
-                { error: 'Content is required' },
+                { error: 'content or healthSnapshot is required' },
                 { status: 400 }
             )
         }
@@ -80,7 +82,8 @@ export async function PATCH(
         const [updatedEntry] = await db
             .update(journalEntries)
             .set({
-                content,
+                ...(content !== undefined && { content }),
+                ...(healthSnapshot !== undefined && { healthSnapshot }),
                 updatedAt: new Date(),
             })
             .where(
