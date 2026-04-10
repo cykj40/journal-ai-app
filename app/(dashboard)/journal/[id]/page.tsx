@@ -127,7 +127,6 @@ const JournalEditorPage = () => {
             {/* AI Sidebar — hidden below lg */}
             <aside className="hidden lg:flex w-[300px] shrink-0 flex-col border-l border-gray-100 dark:border-zinc-800 overflow-y-auto bg-white dark:bg-zinc-900">
                 <AISidebar
-                    entryId={entryId}
                     analysis={analysis ?? entry.analysis}
                     healthSnapshot={entry.healthSnapshot}
                 />

@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { TimeComparison } from '@/components/DateRangeFilter'
 import AnalyticsDashboard from '@/components/AnalyticsDashboard'
 
 interface ClientAnalyticsProps {
@@ -15,8 +13,7 @@ export default function ClientAnalytics({
     startDate: initialStartDate,
     endDate: initialEndDate,
 }: ClientAnalyticsProps) {
-    const [data, setData] = useState(initialData)
-    const [isLoading, setIsLoading] = useState(false)
+    const data = initialData
 
     return (
         <div className="h-full p-8">
@@ -28,17 +25,11 @@ export default function ClientAnalytics({
                     Insights and patterns from your journaling practice
                 </p>
             </div>
-            {isLoading ? (
-                <div className="flex justify-center items-center h-[400px]">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                </div>
-            ) : (
-                <AnalyticsDashboard
-                    data={data}
-                    startDate={initialStartDate}
-                    endDate={initialEndDate}
-                />
-            )}
+            <AnalyticsDashboard
+                data={data}
+                startDate={initialStartDate}
+                endDate={initialEndDate}
+            />
         </div>
     )
 } 

@@ -16,7 +16,7 @@ import {
     Cell,
     Legend,
 } from 'recharts'
-import DateRangeFilter, { DateRange, TimeComparison } from './DateRangeFilter'
+import DateRangeFilter, { TimeComparison } from './DateRangeFilter'
 import {
     exportToJSON,
     exportToCSV,
@@ -161,7 +161,7 @@ export default function AnalyticsDashboard({
     return (
         <div>
             <DateRangeFilter
-                onRangeChange={(range) => {
+                onRangeChange={(_range) => {
                     // Handle range change
                 }}
                 onDateChange={(start, end) => {

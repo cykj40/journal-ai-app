@@ -32,7 +32,7 @@ const DailyPrompt = ({ onInsert }: DailyPromptProps) => {
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-violet-500 mb-1.5 tracking-wide uppercase">
-                        Today's prompt
+                        {"Today's prompt"}
                     </p>
                     <p className="text-sm italic text-gray-600 dark:text-zinc-300 leading-relaxed">
                         {prompt}

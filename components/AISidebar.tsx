@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { type Analysis, type HealthSnapshot } from '@/utils/types'
 
 interface AISidebarProps {
-    entryId: string
     analysis: Analysis
     healthSnapshot?: string
 }
@@ -60,7 +59,7 @@ function HealthRow({
     )
 }
 
-const AISidebar = ({ entryId, analysis, healthSnapshot }: AISidebarProps) => {
+const AISidebar = ({ analysis, healthSnapshot }: AISidebarProps) => {
     const [question, setQuestion] = useState('')
     const [answer, setAnswer] = useState<string | null>(null)
     const [asking, setAsking] = useState(false)
@@ -93,7 +92,7 @@ const AISidebar = ({ entryId, analysis, healthSnapshot }: AISidebarProps) => {
 
             {/* ── Section 1: Today's Snapshot ── */}
             <section>
-                <SectionHeader>Today's Snapshot</SectionHeader>
+                <SectionHeader>{"Today's Snapshot"}</SectionHeader>
 
                 {!hasAnalysis ? (
                     <p className="text-xs text-gray-400 dark:text-zinc-500 italic">
