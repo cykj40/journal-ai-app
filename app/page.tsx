@@ -1,28 +1,83 @@
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function Home() {
   const { userId } = await auth();
   const href = userId ? "/journal" : "/sign-in";
 
   return (
-    <div className="w-screen h-screen bg-gradient-to-b from-purple-200 via-purple-100 to-white flex justify-center items-center">
-      <div className="w-full max-w-[800px] mx-auto px-4">
-        <h1 className="text-6xl md:text-7xl font-bold mb-6 text-indigo-900 tracking-tight leading-tight text-center">
-          Turning reflections into revelations.
-        </h1>
-        <p className="text-2xl md:text-3xl text-center mb-8 text-purple-800 font-light max-w-3xl mx-auto leading-relaxed font-mono">
-          Every thought you pen down holds the power to spark new ideas and uncover hidden truths.
-          Journaling isn&apos;t just about recording life; it&apos;s about transforming the way you see it.
-        </p>
-        <div className="text-center">
+    <div className="min-h-screen bg-parchment overflow-x-hidden scroll-smooth">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 md:px-10 py-5 max-w-[1200px] mx-auto">
+        <span
+          className="text-forest text-sm font-semibold tracking-widest uppercase"
+          style={{ fontFamily: "var(--font-dm-sans)" }}
+        >
+          Health Journal AI
+        </span>
+        <div className="flex items-center gap-6 md:gap-8">
+          {["Features", "About"].map((item) => (
+            <span
+              key={item}
+              className="text-forest-muted text-xs tracking-widest uppercase cursor-pointer hover:text-forest transition-colors"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              {item}
+            </span>
+          ))}
           <Link href={href}>
-            <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg text-xl">
-              Get Started
-            </button>
+            <span
+              className="text-forest-muted text-xs tracking-widest uppercase cursor-pointer hover:text-forest transition-colors"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              Sign in
+            </span>
           </Link>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <div className="flex flex-col sm:flex-row min-h-[calc(100vh-80px)] max-w-[1200px] mx-auto">
+        {/* Text side */}
+        <div className="flex flex-col justify-center px-6 md:px-10 py-12 sm:py-0 sm:w-[55%] order-2 sm:order-1">
+          <div className="max-w-[480px]">
+            <h1
+              className="text-[36px] sm:text-[48px] md:text-[56px] leading-tight font-semibold text-forest mb-6"
+              style={{ fontFamily: "var(--font-playfair)" }}
+            >
+              Health Journal AI
+            </h1>
+            <p
+              className="text-forest-muted text-base md:text-lg leading-relaxed mb-10 font-light"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
+            >
+              Your health journal for an active life. Track wellness, understand
+              patterns, and stay in tune with your body through every adventure.
+            </p>
+            <Link href={href}>
+              <button
+                className="bg-sage hover:bg-opacity-90 text-white text-sm font-medium px-8 py-4 rounded-full transition-all duration-200 min-h-[44px]"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                Start tracking
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Image side — bleeds to right edge */}
+        <div className="relative sm:w-[45%] h-64 sm:h-auto order-1 sm:order-2 overflow-hidden sm:overflow-visible">
+          <Image
+            src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=900&q=80"
+            alt="Hiker on mountain trail"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="(max-width: 640px) 100vw, 45vw"
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }

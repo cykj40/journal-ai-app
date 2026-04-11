@@ -14,6 +14,17 @@ const config: Config = {
                 'gradient-conic':
                     'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
             },
+            colors: {
+                parchment: '#F5F2EC',
+                forest: '#3D4A3A',
+                'forest-muted': '#6B7A66',
+                sage: '#5C7A52',
+                'sage-light': '#C9D5B8',
+            },
+            fontFamily: {
+                serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+                sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+            },
         },
     },
     plugins: [
