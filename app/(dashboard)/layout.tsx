@@ -15,7 +15,7 @@ const DashBoardLayout = ({ children }: { children: React.ReactNode }) => {
             <aside className="absolute left-0 top-0 h-full w-[200px] border-r border-black/10 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/80 backdrop-blur-sm">
                 <div className="px-4 my-4">
                     <span className="text-3xl font-bold text-gray-900 dark:text-zinc-100">
-                        Journal AI
+                        Health Journal AI
                     </span>
                 </div>
                 <div>

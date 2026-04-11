@@ -28,8 +28,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Journal AI - Your AI-Powered Journaling Companion",
-  description: "Transform your thoughts into insights with AI-powered journaling.",
+  title: "Health Journal AI - Your AI-Powered Journaling Companion",
+  description:
+    "Transform your thoughts into health insights with AI-powered journaling.",
 };
 
 export default function RootLayout({

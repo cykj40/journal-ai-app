@@ -17,7 +17,7 @@ test.describe('navigation', () => {
   })
 
   test('sidebar shows brand name and all nav links', async ({ page }) => {
-    await expect(page.getByText('Journal AI')).toBeVisible()
+    await expect(page.getByText('Health Journal AI')).toBeVisible()
     await expect(page.getByRole('link', { name: 'Current Month' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Analytics' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Past Entries' })).toBeVisible()
