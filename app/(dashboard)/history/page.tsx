@@ -32,15 +32,12 @@ const getData = async () => {
         subject: analysis.subject,
         negative: analysis.negative,
         summary: analysis.summary,
-        color: analysis.color || '#0101fe',
+        color: analysis.color || '#5C7A52',
         sentimentScore: parseFloat(analysis.sentimentScore),
         updatedAt: analysis.updatedAt.toISOString()
     }));
 
-    const total = formattedAnalyses.reduce((acc, curr) => {
-        return acc + curr.sentimentScore;
-    }, 0);
-
+    const total = formattedAnalyses.reduce((acc, curr) => acc + curr.sentimentScore, 0);
     const average = total / analyses.length;
     return { analyses: formattedAnalyses, average };
 }
@@ -50,21 +47,46 @@ const HistoryPage = async () => {
 
     if (analyses.length === 0) {
         return (
-            <div className="h-full px-6 py-8 flex flex-col items-center justify-center">
-                <h1 className="text-2xl mb-4">No Journal Entries Yet</h1>
-                <p className="text-gray-500">Start writing to see your mood history!</p>
+            <div className="px-6 pt-6 flex flex-col items-center justify-center min-h-[50vh] gap-3">
+                <div className="w-12 h-12 rounded-full bg-sage-light flex items-center justify-center">
+                    <svg className="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h1
+                    className="text-xl font-semibold text-forest"
+                    style={{ fontFamily: 'var(--font-playfair)' }}
+                >
+                    No journal entries yet
+                </h1>
+                <p
+                    className="text-forest-muted text-sm text-center"
+                    style={{ fontFamily: 'var(--font-dm-sans)' }}
+                >
+                    Start writing to see your mood history.
+                </p>
             </div>
         );
     }
 
     return (
-        <div className="h-full px-6 py-8">
-            <div>
-                <h1 className="text-2xl mb-4">
-                    {`Avg. Sentiment: ${average.toFixed(2)}`}
+        <div className="px-6 pt-6 pb-4">
+            <div className="mb-6">
+                <h1
+                    className="text-2xl font-semibold text-forest"
+                    style={{ fontFamily: 'var(--font-playfair)' }}
+                >
+                    History
                 </h1>
+                <p
+                    className="text-forest-muted text-sm mt-1"
+                    style={{ fontFamily: 'var(--font-dm-sans)' }}
+                >
+                    Avg. sentiment:{' '}
+                    <span className="font-medium text-forest">{average.toFixed(2)}</span>
+                </p>
             </div>
-            <div className="h-[calc(100%-100px)] w-full">
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-sage-light/30" style={{ height: '320px' }}>
                 <HistoryChart data={analyses} />
             </div>
         </div>

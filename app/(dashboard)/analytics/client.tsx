@@ -13,23 +13,27 @@ export default function ClientAnalytics({
     startDate: initialStartDate,
     endDate: initialEndDate,
 }: ClientAnalyticsProps) {
-    const data = initialData
-
     return (
-        <div className="h-full p-8">
-            <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-3xl font-bold">Journal Analytics</h1>
-                </div>
-                <p className="text-gray-500">
-                    Insights and patterns from your journaling practice
+        <div className="px-6 pt-6 pb-4">
+            <div className="mb-6">
+                <h1
+                    className="text-2xl font-semibold text-forest"
+                    style={{ fontFamily: 'var(--font-playfair)' }}
+                >
+                    Analytics
+                </h1>
+                <p
+                    className="text-forest-muted text-sm mt-1"
+                    style={{ fontFamily: 'var(--font-dm-sans)' }}
+                >
+                    Insights and patterns from your journaling
                 </p>
             </div>
             <AnalyticsDashboard
-                data={data}
+                data={initialData}
                 startDate={initialStartDate}
                 endDate={initialEndDate}
             />
         </div>
     )
-} 
+}

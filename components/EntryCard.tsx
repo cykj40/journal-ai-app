@@ -33,44 +33,73 @@ const EntryCard = ({ entry }: EntryCardProps) => {
     }
 
     return (
-        <div className="relative flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800/60 group transition-colors cursor-pointer">
+        <div
+            className="relative bg-white rounded-2xl px-4 py-4 shadow-sm border border-sage-light/30 hover:shadow-md active:scale-[0.99] transition-all cursor-pointer group"
+            style={{ minHeight: '72px' }}
+        >
             {isDeleting && (
-                <div className="absolute inset-0 bg-white/70 dark:bg-zinc-900/70 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-gray-400 dark:text-zinc-500">Deleting...</span>
+                <div className="absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center">
+                    <span
+                        className="text-xs text-forest-muted"
+                        style={{ fontFamily: 'var(--font-dm-sans)' }}
+                    >
+                        Deleting…
+                    </span>
                 </div>
             )}
 
-            {/* Date */}
-            <span className="w-[52px] shrink-0 text-xs text-gray-400 dark:text-zinc-500 font-sans tabular-nums">
-                {shortDate}
-            </span>
+            <div className="flex items-start gap-3">
+                {/* Mood color dot */}
+                <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0 mt-[5px]"
+                    style={{ backgroundColor: entry.analysis.color || '#5C7A52' }}
+                />
 
-            {/* Color dot */}
-            <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: entry.analysis.color || '#6366f1' }}
-            />
+                <div className="flex-1 min-w-0">
+                    {/* Top row: mood label + date */}
+                    <div className="flex items-center justify-between mb-1 gap-2">
+                        <span
+                            className="text-xs font-medium text-forest-muted truncate"
+                            style={{ fontFamily: 'var(--font-dm-sans)' }}
+                        >
+                            {entry.analysis.mood || 'No mood'}
+                            {score ? ` · ${score}` : ''}
+                        </span>
+                        <span
+                            className="text-xs text-forest-muted/60 tabular-nums shrink-0"
+                            style={{ fontFamily: 'var(--font-dm-sans)' }}
+                        >
+                            {shortDate}
+                        </span>
+                    </div>
 
-            {/* Summary */}
-            <p className="flex-1 text-sm text-gray-600 dark:text-zinc-400 truncate min-w-0">
-                {entry.analysis.summary || 'No summary yet'}
-            </p>
+                    {/* Summary */}
+                    <p
+                        className="text-sm text-forest leading-relaxed"
+                        style={{
+                            fontFamily: 'var(--font-dm-sans)',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {entry.analysis.summary || 'No summary yet'}
+                    </p>
+                </div>
 
-            {/* Mood + score badge */}
-            {entry.analysis.mood && (
-                <span className="shrink-0 text-xs text-gray-400 dark:text-zinc-500 font-sans whitespace-nowrap">
-                    {entry.analysis.mood}{score ? ` · ${score}` : ''}
-                </span>
-            )}
-
-            {/* Delete */}
-            <button
-                onClick={handleDelete}
-                className="shrink-0 opacity-0 group-hover:opacity-100 text-xs text-red-400 hover:text-red-600 transition-opacity"
-                title="Delete entry"
-            >
-                ✕
-            </button>
+                {/* Delete button — visible on hover/focus */}
+                <button
+                    onClick={handleDelete}
+                    className="shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex items-center justify-center"
+                    style={{ minHeight: '44px', minWidth: '36px' }}
+                    title="Delete entry"
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
         </div>
     )
 }

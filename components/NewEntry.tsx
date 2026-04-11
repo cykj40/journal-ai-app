@@ -25,7 +25,11 @@ const NewEntry = () => {
             onClick={handleOnClick}
             disabled={isCreating}
             title="New entry"
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-violet-600 hover:bg-violet-700 active:scale-95 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center disabled:opacity-60"
+            className="fixed z-50 w-14 h-14 rounded-full bg-sage hover:bg-sage/90 active:scale-95 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center disabled:opacity-60"
+            style={{
+                bottom: 'calc(3.75rem + env(safe-area-inset-bottom))',
+                right: 'max(1.5rem, calc(50vw - 215px + 1.5rem))',
+            }}
         >
             {isCreating ? (
                 <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
