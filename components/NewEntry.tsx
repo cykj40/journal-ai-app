@@ -30,7 +30,7 @@ const NewEntry = () => {
             onClick={handleOnClick}
             disabled={isCreating}
             title="New entry"
-            className="fab-btn fixed z-50 w-14 h-14 rounded-full bg-sage hover:bg-sage/90 active:scale-95 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center disabled:opacity-60"
+            className="fab-btn fixed z-50 w-14 h-14 rounded-full bg-forest hover:bg-forest/90 active:scale-95 text-white shadow-xl border border-white/20 hover:shadow-2xl transition-all flex items-center justify-center disabled:opacity-60"
         >
             {isCreating ? (
                 <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">

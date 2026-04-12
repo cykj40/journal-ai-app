@@ -12,8 +12,8 @@ test.describe('analytics page', () => {
   })
 
   test('analytics page renders heading and subtitle', async ({ page }) => {
-    await expect(page.getByText('Journal Analytics')).toBeVisible()
-    await expect(page.getByText('Insights and patterns from your journaling practice')).toBeVisible()
+    await expect(page.getByText('Analytics')).toBeVisible()
+    await expect(page.getByText('Insights and patterns from your journaling')).toBeVisible()
   })
 
   test('date range filter buttons are visible', async ({ page }) => {

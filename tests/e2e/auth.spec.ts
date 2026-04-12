@@ -14,7 +14,7 @@ test.describe('authentication', () => {
   test('sign-in with valid credentials redirects to /journal', async ({ page }) => {
     await signIn(page)
     await expect(page).toHaveURL(/journal/)
-    await expect(page.getByText('Journals')).toBeVisible()
+    await expect(page.getByText(/Good (morning|afternoon|evening)/)).toBeVisible()
   })
 
   test('sign-out clears session and redirects away from dashboard', async ({ page }) => {
