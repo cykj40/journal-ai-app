@@ -42,25 +42,42 @@ export const getCurrentAppUser = async () => {
 }
 
 export const syncNewUser = async (authUser: SessionUser) => {
-    const [existingUser] = await db
+    const [existingByAuthId] = await db
         .select()
         .from(users)
         .where(eq(users.authUserId, authUser.id))
 
-    if (!existingUser) {
-        const [newUser] = await db
-            .insert(users)
-            .values({
-                authUserId: authUser.id,
-                email: authUser.email,
-                name: authUser.name || null,
-            })
-            .returning()
+    if (existingByAuthId) return
 
+    const [existingByEmail] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, authUser.email))
+
+    if (existingByEmail) {
         await db
-            .insert(accounts)
-            .values({
-                userId: newUser.id,
+            .update(users)
+            .set({
+                authUserId: authUser.id,
+                name: authUser.name || existingByEmail.name,
+                updatedAt: new Date(),
             })
+            .where(eq(users.id, existingByEmail.id))
+        return
     }
+
+    const [newUser] = await db
+        .insert(users)
+        .values({
+            authUserId: authUser.id,
+            email: authUser.email,
+            name: authUser.name || null,
+        })
+        .returning()
+
+    await db
+        .insert(accounts)
+        .values({
+            userId: newUser.id,
+        })
 }
