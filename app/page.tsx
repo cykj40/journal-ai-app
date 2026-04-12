@@ -1,10 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 export default async function Home() {
-  const { userId } = await auth();
-  const href = userId ? "/journal" : "/sign-in";
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const href = session ? "/journal" : "/sign-in";
 
   return (
     <div className="min-h-screen bg-parchment overflow-x-hidden scroll-smooth">
@@ -31,7 +34,7 @@ export default async function Home() {
               className="text-forest-muted text-xs tracking-widest uppercase cursor-pointer hover:text-forest transition-colors"
               style={{ fontFamily: "var(--font-dm-sans)" }}
             >
-              Sign in
+              {session ? "Open journal" : "Sign in"}
             </span>
           </Link>
         </div>

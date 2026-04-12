@@ -30,12 +30,12 @@ CREATE TABLE IF NOT EXISTS "journal_entries" (
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" text NOT NULL,
-	"clerk_id" text NOT NULL,
+	"auth_user_id" text NOT NULL,
 	"name" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email"),
-	CONSTRAINT "users_clerk_id_unique" UNIQUE("clerk_id")
+	CONSTRAINT "users_auth_user_id_unique" UNIQUE("auth_user_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "vector_entries" (

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and, between, desc } from 'drizzle-orm'
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         const endDate = new Date(searchParams.get('endDate') || '')
         const comparison = searchParams.get('comparison')
 
-        const user = await getUserFromClerkID()
+        const user = await getCurrentAppUser()
 
         // Get current period data
         const currentPeriodData = await getAnalyticsData(startDate, endDate, user.id)

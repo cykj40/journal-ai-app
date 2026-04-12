@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { setupClerkTestingToken } from '@clerk/testing/playwright'
 import { signIn, signOut, clearSession } from './helpers/auth'
 
 test.describe('authentication', () => {
@@ -8,7 +7,6 @@ test.describe('authentication', () => {
   })
 
   test('unauthenticated user is redirected from /journal to sign-in', async ({ page }) => {
-    await setupClerkTestingToken({ page })
     await page.goto('/journal')
     await expect(page).toHaveURL(/sign-in/)
   })

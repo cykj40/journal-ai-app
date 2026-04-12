@@ -1,18 +1,36 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-const isDashboardRoute = createRouteMatcher(['/journal(.*)', '/archive(.*)', '/history(.*)', '/analytics(.*)'])
+const PUBLIC_ROUTE_PREFIXES = ['/sign-in', '/sign-up', '/login', '/signup', '/api/auth']
+const PUBLIC_ROUTE_EXACT = new Set(['/'])
 
-export default clerkMiddleware(async (auth, req) => {
-    if (isDashboardRoute(req)) {
-        await auth.protect()
+export async function middleware(req: NextRequest) {
+    const { pathname } = req.nextUrl
+
+    const isPublic =
+        PUBLIC_ROUTE_EXACT.has(pathname) ||
+        PUBLIC_ROUTE_PREFIXES.some((route) => pathname.startsWith(route))
+
+    if (isPublic) {
+        return NextResponse.next()
     }
-})
+
+    const sessionResponse = await fetch(new URL('/api/auth/get-session', req.url), {
+        headers: req.headers,
+        cache: 'no-store',
+    })
+
+    const session = sessionResponse.ok ? await sessionResponse.json() : null
+
+    if (!session) {
+        return NextResponse.redirect(new URL('/sign-in', req.url))
+    }
+
+    return NextResponse.next()
+}
 
 export const config = {
     matcher: [
-        // Skip Next.js internals and all static files
         "/((?!.*\\..*|_next).*)",
-        // Optional: Allow images and other static files
         "/(api|trpc)(.*)",
     ],
 }

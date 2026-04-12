@@ -1,4 +1,4 @@
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq } from 'drizzle-orm'
@@ -7,7 +7,7 @@ import EntryCard from '@/components/EntryCard'
 import { type Entry } from '@/utils/types'
 
 const getArchivedEntries = async () => {
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
 
     const entries = await db
         .select()

@@ -1,29 +1,35 @@
 import { Page } from '@playwright/test'
-import { clerk, setupClerkTestingToken } from '@clerk/testing/playwright'
 
 export const TEST_EMAIL =
   process.env.TEST_USER_EMAIL ?? 'playwright@journalai-e2e.dev'
+export const TEST_PASSWORD =
+  process.env.TEST_USER_PASSWORD ?? 'PlaywrightPassword123!'
+export const TEST_NAME = 'Playwright Test User'
 
-/**
- * Sign in using @clerk/testing — bypasses the Clerk UI entirely.
- * Uses CLERK_SECRET_KEY to create a session directly by email.
- * Requires clerkSetup() in global-setup.
- */
 export async function signIn(page: Page) {
-  await setupClerkTestingToken({ page })
+  await page.goto('/sign-in')
+  await page.getByLabel('Email').fill(TEST_EMAIL)
+  await page.getByLabel('Password').fill(TEST_PASSWORD)
+  await page.getByRole('button', { name: /^sign in$/i }).click()
 
-  await page.goto('/')
-  await clerk.signIn({
-    page,
-    emailAddress: TEST_EMAIL,
-  })
-
-  await page.goto('/journal')
-  await page.waitForURL('**/journal**', { timeout: 15_000 })
+  try {
+    await page.waitForURL('**/journal**', { timeout: 10_000 })
+    return
+  } catch (_error) {
+    await page.goto('/sign-up')
+    await page.getByLabel('Name').fill(TEST_NAME)
+    await page.getByLabel('Email').fill(TEST_EMAIL)
+    await page.getByLabel('Password').fill(TEST_PASSWORD)
+    await page.getByLabel('Confirm password').fill(TEST_PASSWORD)
+    await page.getByRole('button', { name: /create account/i }).click()
+    await page.waitForURL(/\/(new-user|journal)/, { timeout: 15_000 })
+    await page.waitForURL('**/journal**', { timeout: 15_000 })
+  }
 }
 
 export async function signOut(page: Page) {
-  await clerk.signOut({ page })
+  await page.getByRole('button', { name: /sign out/i }).first().click()
+  await page.waitForURL(/\/(sign-in|$)/, { timeout: 15_000 })
 }
 
 export async function clearSession(page: Page) {

@@ -1,6 +1,6 @@
-import { UserButton } from "@clerk/nextjs";
 import BottomNav from "@/components/BottomNav";
 import Sidebar from "@/components/Sidebar";
+import AuthUserButton from "@/components/AuthUserButton";
 
 const DashBoardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -21,7 +21,7 @@ const DashBoardLayout = ({ children }: { children: React.ReactNode }) => {
           >
             Health Journal AI
           </span>
-          <UserButton />
+          <AuthUserButton />
         </header>
 
         {/* Page content */}

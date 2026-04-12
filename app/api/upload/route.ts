@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import sharp from 'sharp'
 
 // New Next.js 14 route segment config
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
     try {
-        const user = await getUserFromClerkID()
+        const user = await getCurrentAppUser()
         const data = await request.formData()
         const file: File | null = data.get('file') as unknown as File
         const maxWidth = parseInt(data.get('maxWidth') as string) || 1920

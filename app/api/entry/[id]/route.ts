@@ -1,6 +1,6 @@
 import { update } from '@/utils/actions'
 import { analyzeEntry } from '@/utils/ai'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and } from 'drizzle-orm'
@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server'
 
 export const DELETE = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
 
     await db
         .delete(journalEntries)
@@ -27,7 +27,7 @@ export const DELETE = async (request: Request, { params }: { params: Promise<{ i
 export const PATCH = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params
     const { updates } = await request.json()
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
 
     const [entry] = await db
         .update(journalEntries)

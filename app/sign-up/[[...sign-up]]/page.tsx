@@ -1,20 +1,13 @@
-import { SignUp } from "@clerk/nextjs";
+import AuthForm from "@/components/AuthForm";
 
 export default function SignUpPage() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-custom-gradient">
-            <SignUp
-                path="/sign-up"
-                routing="path"
-                signInUrl="/sign-in"
-                appearance={{
-                    elements: {
-                        rootBox: "mx-auto",
-                        card: "bg-white/80 backdrop-blur-md shadow-xl",
-                        formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-                    },
-                }}
-                afterSignUpUrl="/new-user"
+            <AuthForm
+                mode="sign-up"
+                showGoogleAuth={Boolean(
+                    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+                )}
             />
         </div>
     );

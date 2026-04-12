@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import AuthUserButton from '@/components/AuthUserButton'
 
 const navLinks = [
   {
@@ -104,7 +104,7 @@ export default function Sidebar() {
 
       {/* User button */}
       <div className="px-5 py-4 border-t border-sage-light/50">
-        <UserButton />
+        <AuthUserButton />
       </div>
     </aside>
   )

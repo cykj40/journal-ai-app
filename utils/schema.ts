@@ -4,7 +4,7 @@ export const journalEntryStatusEnum = pgEnum('journal_entry_status', ['DRAFT', '
 
 export const users = pgTable('users', {
     id: uuid('id').primaryKey().defaultRandom(),
-    clerkId: text('clerk_id').notNull().unique(),
+    authUserId: text('auth_user_id').notNull().unique(),
     email: text('email').notNull().unique(),
     name: text('name'),
     createdAt: timestamp('created_at').notNull().defaultNow(),

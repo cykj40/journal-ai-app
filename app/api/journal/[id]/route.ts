@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and } from 'drizzle-orm'
@@ -10,7 +10,7 @@ export async function GET(
 ) {
     try {
         const { id } = await params
-        const user = await getUserFromClerkID()
+        const user = await getCurrentAppUser()
 
         const [entry] = await db
             .select()
@@ -68,7 +68,7 @@ export async function PATCH(
 ) {
     try {
         const { id } = await params
-        const user = await getUserFromClerkID()
+        const user = await getCurrentAppUser()
         const body = await request.json()
         const { content, healthSnapshot } = body
 

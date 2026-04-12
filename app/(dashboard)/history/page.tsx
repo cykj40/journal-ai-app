@@ -1,11 +1,11 @@
 import HistoryChart from "@/components/HistoryChart";
-import { getUserFromClerkID } from "@/utils/auth";
+import { getCurrentAppUser } from "@/utils/auth";
 import { db } from "@/utils/db";
 import { entryAnalysis } from "@/utils/schema";
 import { eq, desc } from "drizzle-orm";
 
 const getData = async () => {
-    const user = await getUserFromClerkID();
+    const user = await getCurrentAppUser();
 
     const analyses = await db
         .select({

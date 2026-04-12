@@ -1,5 +1,5 @@
 import { type Entry } from '@/utils/types'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and, gte } from 'drizzle-orm'
@@ -8,7 +8,7 @@ import Link from 'next/link'
 import EntryCard from '@/components/EntryCard'
 
 const getEntries = async () => {
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
     const currentDate = new Date()
     const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
 

@@ -1,12 +1,12 @@
 import { update } from '@/utils/actions'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { NextResponse } from 'next/server'
 
 export const POST = async (request: Request) => {
     const data = await request.json()
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
 
     // Create the journal entry first
     const [entry] = await db

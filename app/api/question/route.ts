@@ -1,5 +1,5 @@
 import { qa } from '@/utils/ai'
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries } from '@/utils/schema'
 import { eq } from 'drizzle-orm'
@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server'
 
 export const POST = async (request: Request) => {
     const { question } = await request.json()
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
 
     const entries = await db
         .select()

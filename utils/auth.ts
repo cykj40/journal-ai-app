@@ -1,31 +1,35 @@
-import type { User } from '@clerk/nextjs/server'
 import { db } from './db'
-import { auth, clerkClient } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 import { users, accounts } from './schema'
 import { eq } from 'drizzle-orm'
+import { headers } from 'next/headers'
 
-export const getUserFromClerkID = async () => {
-    const { userId } = await auth()
+type SessionUser = {
+    id: string
+    email: string
+    name: string
+}
 
-    if (!userId) {
+export const getCurrentAppUser = async () => {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
+
+    if (!session?.user) {
         throw new Error('No user ID found')
     }
 
     const [user] = await db
         .select()
         .from(users)
-        .where(eq(users.clerkId, userId))
+        .where(eq(users.authUserId, session.user.id))
 
     if (!user) {
-        // Get the user data from Clerk
-        const clerkUser = await (await clerkClient()).users.getUser(userId)
-        // Sync the user to our database
-        await syncNewUser(clerkUser)
-        // Try to get the user again
+        await syncNewUser(session.user)
         const [newUser] = await db
             .select()
             .from(users)
-            .where(eq(users.clerkId, userId))
+            .where(eq(users.authUserId, session.user.id))
 
         if (!newUser) {
             throw new Error('Failed to create user')
@@ -37,31 +41,26 @@ export const getUserFromClerkID = async () => {
     return user
 }
 
-export const syncNewUser = async (clerkUser: User) => {
+export const syncNewUser = async (authUser: SessionUser) => {
     const [existingUser] = await db
         .select()
         .from(users)
-        .where(eq(users.clerkId, clerkUser.id))
+        .where(eq(users.authUserId, authUser.id))
 
     if (!existingUser) {
-        const email = clerkUser.emailAddresses[0].emailAddress
-
-        // Insert new user
         const [newUser] = await db
             .insert(users)
             .values({
-                clerkId: clerkUser.id,
-                email,
-                name: clerkUser.firstName ? `${clerkUser.firstName} ${clerkUser.lastName}` : null,
+                authUserId: authUser.id,
+                email: authUser.email,
+                name: authUser.name || null,
             })
             .returning()
 
-        // Create associated account
         await db
             .insert(accounts)
             .values({
                 userId: newUser.id,
-                // Add any additional account fields here
             })
     }
 }

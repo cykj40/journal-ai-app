@@ -1,11 +1,11 @@
-import { getUserFromClerkID } from '@/utils/auth'
+import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis } from '@/utils/schema'
 import { eq, and, between, desc } from 'drizzle-orm'
 import ClientAnalytics from './client'
 
 const getAnalyticsData = async (startDate: Date, endDate: Date) => {
-    const user = await getUserFromClerkID()
+    const user = await getCurrentAppUser()
 
     const entries = await db
         .select()
