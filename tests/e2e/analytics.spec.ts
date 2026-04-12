@@ -12,7 +12,7 @@ test.describe('analytics page', () => {
   })
 
   test('analytics page renders heading and subtitle', async ({ page }) => {
-    await expect(page.getByText('Analytics')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible()
     await expect(page.getByText('Insights and patterns from your journaling')).toBeVisible()
   })
 

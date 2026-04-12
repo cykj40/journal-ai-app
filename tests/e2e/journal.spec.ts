@@ -54,7 +54,7 @@ test.describe('journal CRUD', () => {
     await page.goto('/journal')
     // A card with today's date should appear (shortDate format: "Apr 12")
     const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    await expect(page.getByText(today)).toBeVisible({ timeout: 5_000 })
+    await expect(page.getByText(today).first()).toBeVisible({ timeout: 5_000 })
   })
 
   test('delete entry removes it from the list', async ({ page }) => {
@@ -69,16 +69,17 @@ test.describe('journal CRUD', () => {
 
     await page.goto('/journal')
 
-    // Delete button has title="Delete entry" (always visible on mobile,
-    // hover-only on desktop — hover the card first to be safe)
-    const card = page.locator('.group').first()
+    const cards = page.locator('.group')
+    const countBefore = await cards.count()
+
+    // Hover the first card and delete it
+    const card = cards.first()
     await card.hover()
 
-    // Accept the confirm() dialog
     page.on('dialog', (dialog) => dialog.accept())
     await card.locator('[title="Delete entry"]').click()
 
-    // Card should disappear
-    await expect(card).not.toBeVisible({ timeout: 5_000 })
+    // Card count should decrease
+    await expect(cards).toHaveCount(countBefore - 1, { timeout: 5_000 })
   })
 })

@@ -1,4 +1,4 @@
-import { test, expect, devices } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { signIn, clearSession } from './helpers/auth'
 
 // AskAI (via AISidebar) lives on the journal entry editor page, not the main journal list.

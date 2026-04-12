@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { setupClerkTestingToken } from '@clerk/testing/playwright'
 import { signIn, clearSession } from './helpers/auth'
 
 // ─── Landing page (no auth required) ────────────────────────────────────────
@@ -7,17 +8,20 @@ test.describe('landing page — mobile (390px)', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
   test('hero text is visible', async ({ page }) => {
+    await setupClerkTestingToken({ page })
     await page.goto('/')
     await expect(page.getByText('Health Journal AI').first()).toBeVisible()
     await expect(page.getByText(/Your health journal for an active life/)).toBeVisible()
   })
 
   test('Start tracking CTA is visible', async ({ page }) => {
+    await setupClerkTestingToken({ page })
     await page.goto('/')
     await expect(page.getByText('Start tracking')).toBeVisible()
   })
 
   test('no horizontal overflow', async ({ page }) => {
+    await setupClerkTestingToken({ page })
     await page.goto('/')
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth
@@ -30,12 +34,14 @@ test.describe('landing page — desktop (1280px)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('hero text and image are both visible', async ({ page }) => {
+    await setupClerkTestingToken({ page })
     await page.goto('/')
     await expect(page.getByText('Health Journal AI').first()).toBeVisible()
     await expect(page.getByRole('img', { name: /hiker/i })).toBeVisible()
   })
 
   test('nav links are visible', async ({ page }) => {
+    await setupClerkTestingToken({ page })
     await page.goto('/')
     await expect(page.getByText('Features')).toBeVisible()
     await expect(page.getByText('About')).toBeVisible()
@@ -43,6 +49,7 @@ test.describe('landing page — desktop (1280px)', () => {
   })
 
   test('no horizontal overflow', async ({ page }) => {
+    await setupClerkTestingToken({ page })
     await page.goto('/')
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth

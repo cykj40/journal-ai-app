@@ -25,7 +25,7 @@ test.describe('navigation', () => {
   test('Analytics link navigates to /analytics', async ({ page }) => {
     await page.getByRole('link', { name: 'Analytics' }).first().click()
     await expect(page).toHaveURL(/\/analytics/)
-    await expect(page.getByText('Analytics')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible()
   })
 
   test('History link navigates to /history', async ({ page }) => {

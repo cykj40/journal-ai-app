@@ -217,8 +217,22 @@ const AISidebar = ({ analysis, healthSnapshot }: AISidebarProps) => {
                 </form>
 
                 {answer && (
-                    <div className="mt-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 px-3 py-3 text-xs text-gray-600 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                        {answer}
+                    <div className="mt-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 px-3 py-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">
+                                AI Response:
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={() => { setAnswer(null); setQuestion('') }}
+                                className="text-[10px] font-medium text-violet-500 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                            {answer}
+                        </p>
                     </div>
                 )}
             </section>
