@@ -88,11 +88,11 @@ const EntryCard = ({ entry }: EntryCardProps) => {
                     </p>
                 </div>
 
-                {/* Delete button — visible on hover/focus */}
+                {/* Delete button — always visible on mobile, hover-only on desktop */}
                 <button
                     onClick={handleDelete}
-                    className="shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex items-center justify-center"
-                    style={{ minHeight: '44px', minWidth: '36px' }}
+                    className="shrink-0 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 text-red-400 hover:text-red-600 transition-opacity flex items-center justify-center"
+                    style={{ minHeight: '44px', minWidth: '44px' }}
                     title="Delete entry"
                 >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -88,7 +88,7 @@ const JournalPage = async () => {
     const monthLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
     return (
-        <div className="px-6 pt-6 pb-4 overflow-y-auto">
+        <div className="px-6 pt-6 pb-4 lg:max-w-3xl lg:mx-auto overflow-y-auto">
             {/* Greeting */}
             <div className="mb-8">
                 <h1

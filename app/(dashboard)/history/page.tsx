@@ -47,7 +47,7 @@ const HistoryPage = async () => {
 
     if (analyses.length === 0) {
         return (
-            <div className="px-6 pt-6 flex flex-col items-center justify-center min-h-[50vh] gap-3">
+            <div className="px-6 pt-6 lg:max-w-4xl lg:mx-auto flex flex-col items-center justify-center min-h-[50vh] gap-3">
                 <div className="w-12 h-12 rounded-full bg-sage-light flex items-center justify-center">
                     <svg className="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -70,7 +70,7 @@ const HistoryPage = async () => {
     }
 
     return (
-        <div className="px-6 pt-6 pb-4">
+        <div className="px-6 pt-6 pb-4 lg:max-w-4xl lg:mx-auto">
             <div className="mb-6">
                 <h1
                     className="text-2xl font-semibold text-forest"

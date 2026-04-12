@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { UserButton } from '@clerk/nextjs'
 
-const tabs = [
+const navLinks = [
   {
     label: 'Journal',
     href: '/journal',
     icon: (active: boolean) => (
       <svg
-        className="w-5 h-5"
+        className="w-4 h-4 shrink-0"
         fill={active ? 'currentColor' : 'none'}
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -28,7 +29,7 @@ const tabs = [
     href: '/analytics',
     icon: (active: boolean) => (
       <svg
-        className="w-5 h-5"
+        className="w-4 h-4 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -47,7 +48,7 @@ const tabs = [
     href: '/history',
     icon: (active: boolean) => (
       <svg
-        className="w-5 h-5"
+        className="w-4 h-4 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -63,44 +64,48 @@ const tabs = [
   },
 ]
 
-export default function BottomNav() {
+export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div
-      className="lg:hidden fixed bottom-0 z-40 bg-white border-t border-sage-light"
-      style={{
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '100%',
-        maxWidth: '430px',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-    >
-      <div className="flex items-center justify-around h-14">
-        {tabs.map((tab) => {
-          const active = pathname === tab.href || pathname.startsWith(tab.href + '/')
+    <aside className="hidden lg:flex fixed left-0 top-0 h-full w-60 flex-col bg-white border-r border-sage-light/50 z-20">
+      {/* Brand */}
+      <div className="px-5 py-5 border-b border-sage-light/50">
+        <span
+          className="text-forest text-lg font-semibold leading-tight"
+          style={{ fontFamily: 'var(--font-playfair)' }}
+        >
+          Health Journal AI
+        </span>
+      </div>
+
+      {/* Nav links */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        {navLinks.map((link) => {
+          const active =
+            pathname === link.href || pathname.startsWith(link.href + '/')
           return (
             <Link
-              key={tab.href}
-              href={tab.href}
-              className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-h-[44px]"
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors min-h-[44px] ${
+                active
+                  ? 'bg-sage-light/50 text-sage'
+                  : 'text-forest-muted hover:bg-sage-light/25 hover:text-forest'
+              }`}
+              style={{ fontFamily: 'var(--font-dm-sans)' }}
             >
-              <span className={active ? 'text-sage' : 'text-forest-muted'}>
-                {tab.icon(active)}
-              </span>
-              <span
-                className={`text-[10px] font-medium tracking-wide ${
-                  active ? 'text-sage' : 'text-forest-muted'
-                }`}
-                style={{ fontFamily: 'var(--font-dm-sans)' }}
-              >
-                {tab.label}
-              </span>
+              {link.icon(active)}
+              {link.label}
             </Link>
           )
         })}
+      </nav>
+
+      {/* User button */}
+      <div className="px-5 py-4 border-t border-sage-light/50">
+        <UserButton />
       </div>
-    </div>
+    </aside>
   )
 }
