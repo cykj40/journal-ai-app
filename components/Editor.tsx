@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useRef } from 'react'
+import Link from 'next/link'
 import RichTextEditor, { type RichTextEditorHandle } from './RichTextEditor'
 import DailyPrompt from './DailyPrompt'
 import HealthSnapshot from './HealthSnapshot'
@@ -61,29 +62,38 @@ const Editor = ({
     const dateLabel = formatEntryDate(entry.createdAt)
 
     return (
-        <div className="relative w-full h-full overflow-y-auto bg-gray-50 dark:bg-zinc-950">
-            <div className="mx-auto w-full max-w-[680px] min-h-full bg-white px-10 py-16 pb-32 shadow-sm dark:bg-zinc-900">
-                {dateLabel && (
-                    <p className="mb-8 text-sm tracking-wide text-gray-400 dark:text-zinc-500 font-sans select-none">
-                        {dateLabel}
-                    </p>
-                )}
+        <div className="flex flex-col w-full min-h-screen lg:h-full bg-gray-50 dark:bg-zinc-950">
+            <div className="flex-1 overflow-y-auto">
+                <div className="mx-auto w-full max-w-[680px] bg-white px-10 pt-10 pb-12 shadow-sm dark:bg-zinc-900 min-h-full">
+                    <Link
+                        href="/journal"
+                        className="inline-flex items-center text-sm text-forest hover:opacity-70 transition-opacity mb-6 select-none"
+                    >
+                        ← Journal
+                    </Link>
 
-                {isNew && (
-                    <>
-                        <HealthSnapshot entryId={entry.id} />
-                        <DailyPrompt
-                            onInsert={(text) => editorRef.current?.insertContent(text)}
-                        />
-                    </>
-                )}
+                    {dateLabel && (
+                        <p className="mb-8 text-sm tracking-wide text-gray-400 dark:text-zinc-500 font-sans select-none">
+                            {dateLabel}
+                        </p>
+                    )}
 
-                <RichTextEditor
-                    ref={editorRef}
-                    content={content}
-                    onChange={onChange}
-                    placeholder="Write your thoughts here..."
-                />
+                    {isNew && (
+                        <>
+                            <HealthSnapshot entryId={entry.id} />
+                            <DailyPrompt
+                                onInsert={(text) => editorRef.current?.insertContent(text)}
+                            />
+                        </>
+                    )}
+
+                    <RichTextEditor
+                        ref={editorRef}
+                        content={content}
+                        onChange={onChange}
+                        placeholder="Write your thoughts here..."
+                    />
+                </div>
             </div>
 
             <EntryActionBar
@@ -100,10 +110,6 @@ const Editor = ({
                 onMicStop={stopRecording}
                 micError={micError}
             />
-
-            <div className="absolute bottom-24 right-6 text-xs text-gray-400 dark:text-zinc-600 select-none pointer-events-none transition-opacity duration-300">
-                {isSaving ? 'Saving...' : 'Saved'}
-            </div>
         </div>
     )
 }

@@ -1,7 +1,5 @@
 'use client'
 
-import MicButton from './MicButton'
-
 interface EntryActionBarProps {
     entryId: string | null
     isSaving: boolean
@@ -36,7 +34,7 @@ const EntryActionBar = ({
     micError,
 }: EntryActionBarProps) => {
     return (
-        <div className="sticky bottom-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
+        <div className="z-20 border-t border-gray-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
             {micError && (
                 <div className="mx-auto w-full max-w-[680px] px-10 pt-2">
                     <p className="text-xs text-red-500 dark:text-red-400">{micError}</p>
@@ -52,14 +50,18 @@ const EntryActionBar = ({
                         New Entry
                     </button>
 
-                    {onMicStart && onMicStop && (
-                        <MicButton
-                            isRecording={isRecording}
-                            isTranscribing={isTranscribing}
-                            onStart={onMicStart}
-                            onStop={onMicStop}
-                        />
-                    )}
+                    <button
+                        type="button"
+                        disabled
+                        title="Coming soon"
+                        className={`${baseButtonClassName} border border-gray-200 text-gray-500 opacity-50 cursor-not-allowed dark:border-zinc-700 dark:text-zinc-400`}
+                    >
+                        <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" />
+                        </svg>
+                        Dictate
+                    </button>
                 </div>
 
                 <div className="flex items-center gap-3">

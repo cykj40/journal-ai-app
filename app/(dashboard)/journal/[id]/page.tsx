@@ -6,7 +6,6 @@ import AISidebar from '@/components/AISidebar'
 import DeleteEntryDialog from '@/components/DeleteEntryDialog'
 import { deleteEntry, newEntry } from '@/utils/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useAutosave } from 'react-autosave'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 const POLL_INTERVAL_MS = 4_000
@@ -124,18 +123,6 @@ const JournalEditorPage = () => {
             setIsSaving(false)
         }
     }, [entryId])
-
-    useAutosave({
-        data: editorContent,
-        onSave: async (content) => {
-            try {
-                await saveEntry(content)
-            } catch (error) {
-                console.error('Failed to autosave:', error)
-            }
-        },
-        interval: 2000,
-    })
 
     const handleEditorChange = useCallback((content: string) => {
         latestContentRef.current = content
