@@ -39,4 +39,12 @@ test.describe('navigation', () => {
     await expect(page).toHaveURL(/\/journal/)
     await expect(page.getByText(/Good (morning|afternoon|evening)/)).toBeVisible()
   })
+
+  test('← Journal link in editor navigates back to journal list', async ({ page }) => {
+    await page.locator('button[title="New entry"]').click()
+    await expect(page).toHaveURL(/\/journal\/[0-9a-f-]+/, { timeout: 10_000 })
+    await page.getByRole('link', { name: /← Journal/i }).click()
+    await expect(page).toHaveURL(/\/journal$/, { timeout: 5_000 })
+    await expect(page.getByText(/Good (morning|afternoon|evening)/)).toBeVisible()
+  })
 })

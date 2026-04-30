@@ -9,7 +9,7 @@ export const TEST_NAME = 'Playwright Test User'
 export async function signIn(page: Page) {
   await page.goto('/sign-in')
   await page.getByLabel('Email').fill(TEST_EMAIL)
-  await page.getByLabel('Password').fill(TEST_PASSWORD)
+  await page.getByLabel('Password', { exact: true }).fill(TEST_PASSWORD)
   await page.getByRole('button', { name: /^sign in$/i }).click()
 
   try {
@@ -19,7 +19,7 @@ export async function signIn(page: Page) {
     await page.goto('/sign-up')
     await page.getByLabel('Name').fill(TEST_NAME)
     await page.getByLabel('Email').fill(TEST_EMAIL)
-    await page.getByLabel('Password').fill(TEST_PASSWORD)
+    await page.getByLabel('Password', { exact: true }).fill(TEST_PASSWORD)
     await page.getByLabel('Confirm password').fill(TEST_PASSWORD)
     await page.getByRole('button', { name: /create account/i }).click()
     await page.waitForURL(/\/(new-user|journal)/, { timeout: 15_000 })
