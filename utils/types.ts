@@ -24,3 +24,30 @@ export type HealthSnapshot = {
     sleepHours: number  // e.g. 7.5
     mood: string        // emoji character
 }
+
+export type HealthMetrics = {
+    moodStability: string | null
+    anxietyLevel: string | null
+    motivationLevel: string | null
+    gratitudeMentioned: boolean
+    socialConnection: string | null
+    energyLevel: string | null
+    stressLevel: string | null
+    workStress: boolean
+    exerciseMentioned: boolean
+    exerciseType: string | null
+    exerciseDuration: string | null
+    exerciseIntensity: string | null
+    nutritionMentioned: boolean
+    nutritionSummary: string | null
+    foodLogged: string[]
+    physicalSymptoms: string[]
+    painLevel: string | null
+    painLocation: string[]
+    sunExposure: boolean
+    outdoorTime: boolean
+    breathworkMeditation: boolean
+    medicationsMentioned: string[]
+    healthFlags: string[]
+    sleepQuality: string | null
+}

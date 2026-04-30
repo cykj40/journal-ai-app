@@ -1,6 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schema';
+import { validateEnv } from './env';
+
+validateEnv();
 
 // Define global type for database client
 const globalForDb = globalThis as unknown as {

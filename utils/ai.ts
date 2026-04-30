@@ -1,111 +1,196 @@
-import { ChatOpenAI } from '@langchain/openai'
-import { PromptTemplate } from '@langchain/core/prompts'
-import { loadQARefineChain } from '@langchain/classic/chains'
-import { NeonPostgres } from '@langchain/community/vectorstores/neon'
-import { OpenAIEmbeddings } from '@langchain/openai'
+import Anthropic from '@anthropic-ai/sdk'
 
-import {
-    StructuredOutputParser,
-    OutputFixingParser,
-} from '@langchain/classic/output_parsers'
-import { Document } from '@langchain/core/documents'
-import { z } from 'zod'
+const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY!,
+})
 
-const parser = StructuredOutputParser.fromZodSchema(
-    z.object({
-        mood: z
-            .string()
-            .describe('the mood of the person who wrote the journal entry.'),
-        subject: z.string().describe('the subject of the journal entry.'),
-        negative: z
-            .boolean()
-            .describe(
-                'is the journal entry negative? (i.e. does it contain negative emotions?).'
-            ),
-        summary: z.string().describe('quick summary of the entire entry.'),
-        color: z
-            .string()
-            .describe(
-                'a hexidecimal color code that represents the mood of the entry. Example #0101fe for blue representing happiness.'
-            ),
-        sentimentScore: z
-            .number()
-            .describe(
-                'sentiment of the text and rated on a scale from -10 to 10, where -10 is extremely negative, 0 is neutral, and 10 is extremely positive.'
-            ),
-    })
-)
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-const getPrompt = async (content: string) => {
-    const format_instructions = parser.getFormatInstructions()
+export type EntryAnalysis = {
+    // Core mood
+    mood: string
+    subject: string
+    negative: boolean
+    summary: string
+    color: string
+    sentimentScore: number
 
-    const prompt = new PromptTemplate({
-        template:
-            'Analyze the following journal entry. Follow the intrusctions and format your response to match the format instructions, no matter what! \n{format_instructions}\n{entry}',
-        inputVariables: ['entry'],
-        partialVariables: { format_instructions },
-    })
+    // Mental / cognitive
+    moodStability: 'stable' | 'variable' | 'crashed'
+    anxietyLevel: number | null        // 1–5
+    motivationLevel: number | null     // 1–5
+    gratitudeMentioned: boolean
+    socialConnection: 'isolated' | 'neutral' | 'connected' | null
 
-    const input = await prompt.format({
-        entry: content,
-    })
+    // Energy & stress
+    energyLevel: number | null         // 1–5
+    stressLevel: number | null         // 1–5
+    workStress: boolean
+    workStressSeverity: number | null  // 1–5
 
-    return input
+    // Sleep
+    sleepQuality: number | null        // 1–5
+
+    // Exercise & movement
+    exerciseMentioned: boolean
+    exerciseType: string | null
+    exerciseDuration: string | null
+    exerciseIntensity: 'low' | 'medium' | 'high' | null
+    stretchingMobility: boolean
+    restDayMentioned: boolean
+
+    // Nutrition & substances
+    nutritionMentioned: boolean
+    nutritionSummary: string | null
+    foodLogged: string[]
+    waterIntake: string | null
+    alcoholMentioned: boolean
+    caffeineNoted: boolean
+
+    // Physical body
+    physicalSymptoms: string[]
+    painLevel: number | null           // 0–10
+    painLocation: string[]
+    heartRateNoted: boolean
+    digestionNoted: boolean
+    digestionNotes: string | null
+    skinNoted: boolean
+    cycleNoted: boolean
+
+    // Environment & recovery
+    sunExposure: boolean
+    outdoorTime: boolean
+    coldExposure: boolean
+    breathworkMeditation: boolean
+    travelMentioned: boolean
+    naturalEnvironment: boolean
+    screenTimeNoted: boolean
+
+    // Medications & supplements
+    medicationsMentioned: string[]
+
+    // Summary flags
+    healthFlags: string[]
 }
 
-export const analyzeEntry = async (entry: { id: string; userId: string; content: string; status: "DRAFT" | "PUBLISHED" | "ARCHIVED" | null; createdAt: Date; updatedAt: Date; }) => {
-    const input = await getPrompt(entry.content)
-    const model = new ChatOpenAI({
-        temperature: 0,
-        modelName: 'gpt-3.5-turbo',
-        maxTokens: 1000
+// ── analyzeEntry ──────────────────────────────────────────────────────────────
+
+export const analyzeEntry = async (entry: {
+    id: string
+    content: string
+}): Promise<EntryAnalysis> => {
+    const message = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 2000,
+        messages: [
+            {
+                role: 'user',
+                content: `You are a health and wellness journal analyst. Analyze the following journal entry and extract both emotional and physical health signals.
+
+Respond ONLY with a valid JSON object. No markdown, no explanation, no code blocks. Just raw JSON.
+
+Required fields and their types:
+{
+  "mood": "string — primary mood label e.g. Happy, Anxious, Tired, Motivated",
+  "subject": "string — main topic/theme of the entry",
+  "negative": "boolean — true if entry contains predominantly negative emotions",
+  "summary": "string — 1-2 sentence summary of the entry",
+  "color": "string — hex color representing the mood e.g. #5C7A52 for calm, #E57373 for stress",
+  "sentimentScore": "number — -10 to 10 scale",
+  "moodStability": "stable | variable | crashed",
+  "anxietyLevel": "number 1-5 or null if not inferable",
+  "motivationLevel": "number 1-5 or null if not inferable",
+  "gratitudeMentioned": "boolean",
+  "socialConnection": "isolated | neutral | connected | null",
+  "energyLevel": "number 1-5 or null",
+  "stressLevel": "number 1-5 or null",
+  "workStress": "boolean",
+  "workStressSeverity": "number 1-5 or null",
+  "sleepQuality": "number 1-5 or null",
+  "exerciseMentioned": "boolean",
+  "exerciseType": "string or null — e.g. running, yoga, cycling, walking",
+  "exerciseDuration": "string or null — e.g. 30 minutes",
+  "exerciseIntensity": "low | medium | high | null",
+  "stretchingMobility": "boolean",
+  "restDayMentioned": "boolean",
+  "nutritionMentioned": "boolean",
+  "nutritionSummary": "string or null",
+  "foodLogged": "array of strings",
+  "waterIntake": "string or null",
+  "alcoholMentioned": "boolean",
+  "caffeineNoted": "boolean",
+  "physicalSymptoms": "array of strings e.g. headache, fatigue, bloating",
+  "painLevel": "number 0-10 or null",
+  "painLocation": "array of strings e.g. lower back, knees",
+  "heartRateNoted": "boolean",
+  "digestionNoted": "boolean",
+  "digestionNotes": "string or null",
+  "skinNoted": "boolean",
+  "cycleNoted": "boolean",
+  "sunExposure": "boolean",
+  "outdoorTime": "boolean",
+  "coldExposure": "boolean",
+  "breathworkMeditation": "boolean",
+  "travelMentioned": "boolean",
+  "naturalEnvironment": "boolean",
+  "screenTimeNoted": "boolean",
+  "medicationsMentioned": "array of strings",
+  "healthFlags": "array of strings — notable health signals worth flagging e.g. reports chronic fatigue, skipped meals, high stress day, sleep deprived"
+}
+
+Journal entry:
+${entry.content}`,
+            },
+        ],
     })
-    const output = await model.invoke(input)
+
+    const raw = message.content[0].type === 'text' ? message.content[0].text : ''
+
     try {
-        return parser.parse(output.content.toString())
-    } catch (error) {
-        const fixParser = OutputFixingParser.fromLLM(
-            new ChatOpenAI({ temperature: 0, modelName: 'gpt-3.5-turbo' }),
-            parser
-        )
-        const fix = await fixParser.parse(output.content.toString())
-        return fix
+        return JSON.parse(raw) as EntryAnalysis
+    } catch {
+        // Second attempt — ask Claude to fix its own output
+        const fix = await anthropic.messages.create({
+            model: 'claude-sonnet-4-5',
+            max_tokens: 2000,
+            messages: [
+                {
+                    role: 'user',
+                    content: `The following is not valid JSON. Fix it and return only valid JSON, no markdown:\n\n${raw}`,
+                },
+            ],
+        })
+        const fixedRaw = fix.content[0].type === 'text' ? fix.content[0].text : '{}'
+        return JSON.parse(fixedRaw) as EntryAnalysis
     }
 }
 
-export const qa = async (question: string, entries: { id: string; content: string; createdAt: Date }[]) => {
-    const docs = entries.map(
-        (entry) =>
-            new Document({
-                pageContent: entry.content,
-                metadata: { source: entry.id, date: entry.createdAt },
-            })
-    )
-    const model = new ChatOpenAI({
-        temperature: 0,
-        modelName: 'gpt-3.5-turbo',
-        maxTokens: 1000
-    })
-    const chain = loadQARefineChain(model)
-    const embeddings = new OpenAIEmbeddings({
-        dimensions: 256,
-        model: "text-embedding-3-small"
-    })
+// ── qa ────────────────────────────────────────────────────────────────────────
 
-    const vectorStore = await NeonPostgres.initialize(embeddings, {
-        connectionString: process.env.DATABASE_URL!
-    })
+export const qa = async (
+    question: string,
+    entries: { id: string; content: string; createdAt: Date }[]
+): Promise<string> => {
+    const recent = entries.slice(-20)
+    const context = recent
+        .map(e => `[${e.createdAt.toISOString().slice(0, 10)}]\n${e.content}`)
+        .join('\n\n---\n\n')
 
-    await vectorStore.addDocuments(docs)
-    const relevantDocs = await vectorStore.similaritySearch(question)
-    const healthAwareQuestion =
-        'You are a health and mood journal coach. Answer questions about mood, energy, stress, sleep, and physical symptoms based on the journal entries provided. ' +
-        question
+    const message = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1024,
+        messages: [
+            {
+                role: 'user',
+                content: `You are a health and mood journal coach. Answer questions about mood, energy, stress, sleep, and physical symptoms based on the journal entries provided. Keep answers concise — 2-3 sentences max unless more detail is clearly needed.
 
-    const res = await chain.call({
-        input_documents: relevantDocs,
-        question: healthAwareQuestion,
+Journal entries:
+${context}
+
+User question: ${question}`,
+            },
+        ],
     })
 
-    return res.output_text
+    return message.content[0].type === 'text' ? message.content[0].text : 'Unable to generate response.'
 }
