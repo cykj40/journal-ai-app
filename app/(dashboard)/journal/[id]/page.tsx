@@ -19,13 +19,15 @@ const JournalEditorPage = () => {
     const [analysis, setAnalysis] = useState<Analysis | null>(null)
     const [loading, setLoading] = useState(true)
     const [editorContent, setEditorContent] = useState('')
-    const [isDirty, setIsDirty] = useState(false)
+    const [isDirty, setIsDirty] = useState(isNew)
+    const [isSaved, setIsSaved] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
     const latestContentRef = useRef<string>('')
     const savedContentRef = useRef<string>('')
     const savingInFlightRef = useRef(false)
+    const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     // ── Initial load ──────────────────────────────────────────────
     useEffect(() => {
@@ -53,7 +55,8 @@ const JournalEditorPage = () => {
 
     // ── Save content ──────────────────────────────────────────────
     const saveEntry = useCallback(async (content: string) => {
-        if (!entryId || savingInFlightRef.current || content === savedContentRef.current) return
+        if (!entryId || savingInFlightRef.current) return
+        if (!isDirty && content === savedContentRef.current) return
 
         latestContentRef.current = content
         savingInFlightRef.current = true
@@ -73,7 +76,7 @@ const JournalEditorPage = () => {
         } finally {
             savingInFlightRef.current = false
         }
-    }, [entryId])
+    }, [entryId, isDirty])
 
     const handleEditorChange = useCallback((content: string) => {
         latestContentRef.current = content
@@ -84,6 +87,9 @@ const JournalEditorPage = () => {
     const handleSave = useCallback(async () => {
         try {
             await saveEntry(editorContent)
+            setIsSaved(true)
+            if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+            savedTimerRef.current = setTimeout(() => setIsSaved(false), 2000)
             // Trigger health analysis after explicit save — fire and forget
             fetch(`/api/entry/${entryId}`, {
                 method: 'PATCH',
@@ -96,6 +102,12 @@ const JournalEditorPage = () => {
             console.error('Failed to save entry:', error)
         }
     }, [editorContent, entryId, saveEntry])
+
+    useEffect(() => {
+        return () => {
+            if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+        }
+    }, [])
 
     const handleDelete = useCallback(() => {
         setIsDeleteDialogOpen(true)
@@ -173,6 +185,7 @@ const JournalEditorPage = () => {
                         content={editorContent}
                         onChange={handleEditorChange}
                         isNew={isNew}
+                        isSaved={isSaved}
                         onSave={() => {
                             void handleSave()
                         }}

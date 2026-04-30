@@ -13,6 +13,7 @@ interface EditorProps {
     content: string
     onChange: (content: string) => void
     isNew?: boolean
+    isSaved: boolean
     onSave: () => void
     onDelete: () => void
 }
@@ -32,6 +33,7 @@ const Editor = ({
     content,
     onChange,
     isNew = false,
+    isSaved,
     onSave,
     onDelete,
 }: EditorProps) => {
@@ -82,6 +84,9 @@ const Editor = ({
                         >
                             Delete
                         </button>
+                        {isSaved && (
+                            <span className="text-xs text-[#5C7A52] font-medium">✓ Saved</span>
+                        )}
                         <button
                             onClick={onSave}
                             className="px-4 py-2 rounded-xl bg-[#5C7A52] text-white text-sm font-medium hover:bg-[#3D4A3A] transition-colors"
