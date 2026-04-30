@@ -1,6 +1,7 @@
 const required = [
     'DATABASE_URL',
     'BETTER_AUTH_SECRET',
+    'BETTER_AUTH_URL',
     'ANTHROPIC_API_KEY',
     'OPENAI_API_KEY',
 ] as const

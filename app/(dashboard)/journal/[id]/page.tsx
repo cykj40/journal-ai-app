@@ -8,8 +8,6 @@ import { deleteEntry } from '@/utils/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-const ANALYSIS_DEBOUNCE_MS = 8_000
-
 const JournalEditorPage = () => {
     const params = useParams<{ id: string }>()
     const router = useRouter()
@@ -25,11 +23,9 @@ const JournalEditorPage = () => {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
-    // Ref to latest content for the debounced analysis trigger
     const latestContentRef = useRef<string>('')
     const savedContentRef = useRef<string>('')
     const savingInFlightRef = useRef(false)
-    const analysisTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     // ── Initial load ──────────────────────────────────────────────
     useEffect(() => {
@@ -55,14 +51,7 @@ const JournalEditorPage = () => {
         loadEntry()
     }, [entryId])
 
-    // ── Cleanup debounce timer on unmount ─────────────────────────
-    useEffect(() => {
-        return () => {
-            if (analysisTimerRef.current) clearTimeout(analysisTimerRef.current)
-        }
-    }, [])
-
-    // ── Save content + schedule analysis trigger ──────────────────
+    // ── Save content ──────────────────────────────────────────────
     const saveEntry = useCallback(async (content: string) => {
         if (!entryId || savingInFlightRef.current || content === savedContentRef.current) return
 
@@ -81,19 +70,6 @@ const JournalEditorPage = () => {
             setEntry(prev => prev ? { ...prev, content: data.content, updatedAt: data.updatedAt } : prev)
             savedContentRef.current = content
             setIsDirty(latestContentRef.current !== content)
-
-            if (analysisTimerRef.current) clearTimeout(analysisTimerRef.current)
-            analysisTimerRef.current = setTimeout(async () => {
-                try {
-                    await fetch(`/api/entry/${entryId}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ updates: { content: latestContentRef.current } }),
-                    })
-                } catch {
-                    // silent — analysis is best-effort
-                }
-            }, ANALYSIS_DEBOUNCE_MS)
         } finally {
             savingInFlightRef.current = false
         }
@@ -108,10 +84,18 @@ const JournalEditorPage = () => {
     const handleSave = useCallback(async () => {
         try {
             await saveEntry(editorContent)
+            // Trigger health analysis after explicit save — fire and forget
+            fetch(`/api/entry/${entryId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ updates: { content: editorContent } }),
+            }).catch(() => {
+                // silent — analysis is best-effort
+            })
         } catch (error) {
             console.error('Failed to save entry:', error)
         }
-    }, [editorContent, saveEntry])
+    }, [editorContent, entryId, saveEntry])
 
     const handleDelete = useCallback(() => {
         setIsDeleteDialogOpen(true)
