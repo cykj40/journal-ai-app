@@ -1,11 +1,9 @@
 'use client'
-import { useCallback, useRef } from 'react'
+import { useRef } from 'react'
 import Link from 'next/link'
 import RichTextEditor, { type RichTextEditorHandle } from './RichTextEditor'
 import DailyPrompt from './DailyPrompt'
 import HealthSnapshot from './HealthSnapshot'
-import EntryActionBar from './EntryActionBar'
-import { useVoiceDictation } from '@/hooks/useVoiceDictation'
 
 interface EditorProps {
     entry: {
@@ -15,12 +13,8 @@ interface EditorProps {
     content: string
     onChange: (content: string) => void
     isNew?: boolean
-    isSaving: boolean
-    isDirty: boolean
     onSave: () => void
     onDelete: () => void
-    onNew: () => void
-    onDiscard: () => void
 }
 
 function formatEntryDate(dateStr?: string): string {
@@ -38,40 +32,16 @@ const Editor = ({
     content,
     onChange,
     isNew = false,
-    isSaving,
-    isDirty,
     onSave,
     onDelete,
-    onNew,
-    onDiscard,
 }: EditorProps) => {
     const editorRef = useRef<RichTextEditorHandle>(null)
-
-    const handleTranscript = useCallback((text: string) => {
-        editorRef.current?.insertContent(text + ' ')
-    }, [])
-
-    const {
-        isRecording,
-        isTranscribing,
-        startRecording,
-        stopRecording,
-        error: micError,
-    } = useVoiceDictation(handleTranscript)
-
     const dateLabel = formatEntryDate(entry.createdAt)
 
     return (
         <div className="flex flex-col w-full min-h-screen lg:h-full bg-gray-50 dark:bg-zinc-950">
             <div className="flex-1 overflow-y-auto">
                 <div className="mx-auto w-full max-w-[680px] bg-white px-10 pt-10 pb-12 shadow-sm dark:bg-zinc-900 min-h-full">
-                    <Link
-                        href="/journal"
-                        className="inline-flex items-center text-sm text-forest hover:opacity-70 transition-opacity mb-6 select-none"
-                    >
-                        ← Journal
-                    </Link>
-
                     {dateLabel && (
                         <p className="mb-8 text-sm tracking-wide text-gray-400 dark:text-zinc-500 font-sans select-none">
                             {dateLabel}
@@ -91,25 +61,36 @@ const Editor = ({
                         ref={editorRef}
                         content={content}
                         onChange={onChange}
-                        placeholder="Write your thoughts here..."
+                        placeholder="Write your entry..."
                     />
+
+                    <div className="mt-4 flex items-center gap-3">
+                        <Link href="/journal" className="text-sm text-[#3D4A3A] opacity-60 hover:opacity-100 transition-opacity">
+                            ← Journal
+                        </Link>
+                        <div className="flex-1" />
+                        <button
+                            disabled
+                            title="Coming soon"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#C9D5B8] text-sm text-[#3D4A3A] opacity-40 cursor-not-allowed"
+                        >
+                            🎤 Dictate
+                        </button>
+                        <button
+                            onClick={onDelete}
+                            className="px-4 py-2 rounded-xl border border-red-300 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                            Delete
+                        </button>
+                        <button
+                            onClick={onSave}
+                            className="px-4 py-2 rounded-xl bg-[#5C7A52] text-white text-sm font-medium hover:bg-[#3D4A3A] transition-colors"
+                        >
+                            Save
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <EntryActionBar
-                entryId={entry.id}
-                isSaving={isSaving}
-                isDirty={isDirty}
-                onSave={onSave}
-                onDelete={onDelete}
-                onNew={onNew}
-                onDiscard={onDiscard}
-                isRecording={isRecording}
-                isTranscribing={isTranscribing}
-                onMicStart={startRecording}
-                onMicStop={stopRecording}
-                micError={micError}
-            />
         </div>
     )
 }

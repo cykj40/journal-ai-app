@@ -4,11 +4,10 @@ import { type Entry, type Analysis } from '@/utils/types'
 import Editor from '@/components/Editor'
 import AISidebar from '@/components/AISidebar'
 import DeleteEntryDialog from '@/components/DeleteEntryDialog'
-import { deleteEntry, newEntry } from '@/utils/api'
+import { deleteEntry } from '@/utils/api'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-const POLL_INTERVAL_MS = 4_000
 const ANALYSIS_DEBOUNCE_MS = 8_000
 
 const JournalEditorPage = () => {
@@ -23,14 +22,13 @@ const JournalEditorPage = () => {
     const [loading, setLoading] = useState(true)
     const [editorContent, setEditorContent] = useState('')
     const [isDirty, setIsDirty] = useState(false)
-    const [isSaving, setIsSaving] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
     // Ref to latest content for the debounced analysis trigger
     const latestContentRef = useRef<string>('')
     const savedContentRef = useRef<string>('')
-    const isSavingRef = useRef(false)
+    const savingInFlightRef = useRef(false)
     const analysisTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     // ── Initial load ──────────────────────────────────────────────
@@ -57,27 +55,6 @@ const JournalEditorPage = () => {
         loadEntry()
     }, [entryId])
 
-    // ── Analysis polling — refresh sidebar every 4 s ──────────────
-    useEffect(() => {
-        if (!entryId) return
-
-        const interval = setInterval(async () => {
-            try {
-                const res = await fetch(`/api/journal/${entryId}`)
-                if (!res.ok) return
-                const { data } = await res.json()
-                // Only update analysis state (avoid clobbering editor content)
-                setAnalysis(data.analysis)
-                // Also update healthSnapshot on the entry
-                setEntry(prev => prev ? { ...prev, healthSnapshot: data.healthSnapshot } : prev)
-            } catch {
-                // silent — polling is best-effort
-            }
-        }, POLL_INTERVAL_MS)
-
-        return () => clearInterval(interval)
-    }, [entryId])
-
     // ── Cleanup debounce timer on unmount ─────────────────────────
     useEffect(() => {
         return () => {
@@ -87,11 +64,10 @@ const JournalEditorPage = () => {
 
     // ── Save content + schedule analysis trigger ──────────────────
     const saveEntry = useCallback(async (content: string) => {
-        if (!entryId || isSavingRef.current || content === savedContentRef.current) return
+        if (!entryId || savingInFlightRef.current || content === savedContentRef.current) return
 
         latestContentRef.current = content
-        isSavingRef.current = true
-        setIsSaving(true)
+        savingInFlightRef.current = true
 
         try {
             const res = await fetch(`/api/journal/${entryId}`, {
@@ -119,8 +95,7 @@ const JournalEditorPage = () => {
                 }
             }, ANALYSIS_DEBOUNCE_MS)
         } finally {
-            isSavingRef.current = false
-            setIsSaving(false)
+            savingInFlightRef.current = false
         }
     }, [entryId])
 
@@ -158,15 +133,6 @@ const JournalEditorPage = () => {
         }
     }, [entry?.id, router])
 
-    const handleNew = useCallback(async () => {
-        try {
-            const { data } = await newEntry()
-            router.push(`/journal/${data.id}?new=true`)
-        } catch (error) {
-            console.error('Failed to create entry:', error)
-        }
-    }, [router])
-
     const handleDiscard = useCallback(() => {
         const nextContent = savedContentRef.current
         latestContentRef.current = nextContent
@@ -180,7 +146,7 @@ const JournalEditorPage = () => {
 
             if (isSaveShortcut) {
                 event.preventDefault()
-                if (!isSaving && isDirty) {
+                if (!savingInFlightRef.current && isDirty) {
                     void handleSave()
                 }
             }
@@ -194,7 +160,7 @@ const JournalEditorPage = () => {
         window.addEventListener('keydown', handleKeyDown)
 
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [handleDiscard, handleSave, isDirty, isSaving])
+    }, [handleDiscard, handleSave, isDirty])
 
     // ── Loading / not-found states ────────────────────────────────
     if (loading) {
@@ -223,16 +189,10 @@ const JournalEditorPage = () => {
                         content={editorContent}
                         onChange={handleEditorChange}
                         isNew={isNew}
-                        isSaving={isSaving}
-                        isDirty={isDirty}
                         onSave={() => {
                             void handleSave()
                         }}
                         onDelete={handleDelete}
-                        onNew={() => {
-                            void handleNew()
-                        }}
-                        onDiscard={handleDiscard}
                     />
                 </div>
 

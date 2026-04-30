@@ -13,6 +13,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  .ProseMirror {
+    min-height: 280px;
+  }
 }
 
 @layer utilities {

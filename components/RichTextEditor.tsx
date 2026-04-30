@@ -119,7 +119,7 @@ const ImageCropDialog = ({ imageUrl, onCrop, onCancel }: ImageCropDialogProps) =
 }
 
 const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(
-function RichTextEditor({ content, onChange, placeholder = 'Start writing...' }, ref) {
+function RichTextEditor({ content, onChange, placeholder = 'Write your entry...' }, ref) {
     const [cropImage, setCropImage] = useState<string | null>(null)
 
     const editor = useEditor({
@@ -261,7 +261,10 @@ function RichTextEditor({ content, onChange, placeholder = 'Start writing...' },
                 </BubbleButton>
             </BubbleMenu>
 
-            <div {...getRootProps()} className="relative">
+            <div {...getRootProps()} className="bg-white rounded-2xl border border-[#C9D5B8] shadow-sm min-h-[320px] p-6 mt-4 relative">
+                <p className="text-xs uppercase tracking-widest font-medium text-[#3D4A3A] opacity-60 mb-3">
+                    {"Today's Entry"}
+                </p>
                 <EditorContent editor={editor} />
                 {isDragActive && (
                     <div className="absolute inset-0 bg-blue-50 border-2 border-blue-400 border-dashed rounded-lg flex items-center justify-center pointer-events-none">
