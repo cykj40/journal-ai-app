@@ -15,6 +15,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.74",
     "@anthropic-ai/sdk": "^0.91.1",
     "@better-auth/drizzle-adapter": "^1.6.2",
     "@emoji-mart/data": "^1.2.1",
@@ -36,6 +37,7 @@
     "@tiptap/starter-kit": "^2.11.5",
     "@types/pg": "^8.11.10",
     "@vitejs/plugin-react-swc": "^3.7.2",
+    "ai": "^6.0.173",
     "better-auth": "^1.6.2",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.45.2",

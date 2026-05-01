@@ -6,6 +6,8 @@ import { journalEntries, entryAnalysis, healthMetrics } from '@/utils/schema'
 import { eq, and } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
+export const maxDuration = 60
+
 export const DELETE = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params
     const user = await getCurrentAppUser()

@@ -5,6 +5,8 @@ import { entryAnalysis, healthMetrics } from '@/utils/schema'
 import { and, desc, eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
+export const maxDuration = 60
+
 export const POST = async (_request: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params
     const user = await getCurrentAppUser()

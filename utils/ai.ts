@@ -1,4 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import { generateObject } from 'ai'
+import { z } from 'zod'
 
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -197,37 +200,21 @@ User question: ${question}`,
 
 // ── generateBalanceInsight ────────────────────────────────────────────────────
 
+const BalanceInsightSchema = z.object({
+    score: z.number().int().min(0).max(100),
+    insight: z.string(),
+    recommendation: z.string(),
+})
+
 export const generateBalanceInsight = async (
     metrics: Array<Record<string, unknown>>
 ): Promise<{ score: number; insight: string; recommendation: string }> => {
-    const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 500,
-        system: `You are a health balance coach. Analyze the user's recent health metrics and return ONLY a valid JSON object with three fields: \`score\` (integer 0-100 representing overall life balance for today — higher means more balanced across exercise, nutrition, sleep, social connection, mental health, stress management), \`insight\` (1-2 sentences describing the main pattern you see across their recent entries), \`recommendation\` (1 specific actionable suggestion to improve balance — be direct and concrete, not generic). If they worked a lot with no social time suggest friends. If they exercised every day but slept poorly focus on sleep. If nutrition is poor suggest a specific food change. No markdown, no explanation, just raw JSON.`,
-        messages: [
-            {
-                role: 'user',
-                content: JSON.stringify(metrics),
-            },
-        ],
+    const { object } = await generateObject({
+        model: anthropicProvider('claude-sonnet-4-5'),
+        schema: BalanceInsightSchema,
+        system: `You are a health balance coach. Analyze the user's recent health metrics and return a score (0-100 representing overall life balance — higher means more balanced across exercise, nutrition, sleep, social connection, mental health, stress management), an insight (1-2 sentences describing the main pattern), and a recommendation (1 specific actionable suggestion to improve balance). Be direct and concrete, not generic.`,
+        prompt: `Recent health metrics: ${JSON.stringify(metrics)}`,
     })
 
-    const raw = message.content[0].type === 'text' ? message.content[0].text : ''
-
-    try {
-        return JSON.parse(raw) as { score: number; insight: string; recommendation: string }
-    } catch {
-        const fix = await anthropic.messages.create({
-            model: 'claude-sonnet-4-5',
-            max_tokens: 500,
-            messages: [
-                {
-                    role: 'user',
-                    content: `The following is not valid JSON. Fix it and return only valid JSON, no markdown:\n\n${raw}`,
-                },
-            ],
-        })
-        const fixedRaw = fix.content[0].type === 'text' ? fix.content[0].text : '{}'
-        return JSON.parse(fixedRaw) as { score: number; insight: string; recommendation: string }
-    }
+    return object
 }
