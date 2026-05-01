@@ -207,13 +207,20 @@ const BalanceInsightSchema = z.object({
 })
 
 export const generateBalanceInsight = async (
-    metrics: Array<Record<string, unknown>>
+    metrics: Array<Record<string, unknown>>,
+    journalEntryContent: string
 ): Promise<{ score: number; insight: string; recommendation: string }> => {
     const { object } = await generateObject({
         model: anthropicProvider('claude-sonnet-4-5'),
         schema: BalanceInsightSchema,
-        system: `You are a health balance coach. Analyze the user's recent health metrics and return a score (0-100 representing overall life balance — higher means more balanced across exercise, nutrition, sleep, social connection, mental health, stress management), an insight (1-2 sentences describing the main pattern), and a recommendation (1 specific actionable suggestion to improve balance). Be direct and concrete, not generic.`,
-        prompt: `Recent health metrics: ${JSON.stringify(metrics)}`,
+        system: `You are a health balance coach. Analyze this journal entry AND any available health metrics. If metrics are empty, infer health signals directly from the journal text. Return a score (0-100 representing overall life balance — higher means more balanced across exercise, nutrition, sleep, social connection, mental health, stress management), an insight (1-2 sentences describing the main pattern), and a recommendation (1 specific actionable suggestion to improve balance). Be direct and concrete, not generic. Never dismiss the user for missing data if the journal entry contains any text.`,
+        prompt: `Analyze this journal entry AND any available health metrics. If metrics are empty, infer health signals directly from the journal text.
+
+Journal entry (HTML or plain text is fine):
+${journalEntryContent.trim() || '(No entry text)'}
+
+Recent health metrics (may be empty or partial):
+${JSON.stringify(metrics)}`,
     })
 
     return object
