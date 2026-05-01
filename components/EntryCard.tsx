@@ -23,6 +23,18 @@ const EntryCard = ({ entry }: EntryCardProps) => {
         : null
     const score = rawScore !== null && !isNaN(rawScore) ? rawScore.toFixed(1) : null
 
+    const balanceScore = entry.analysis?.balanceScore != null && !isNaN(Number(entry.analysis.balanceScore))
+        ? Math.round(Number(entry.analysis.balanceScore))
+        : null
+
+    const balancePill = balanceScore !== null
+        ? balanceScore >= 75
+            ? { label: 'Balanced', className: 'bg-sage text-white' }
+            : balanceScore >= 50
+                ? { label: 'Moderate', className: 'bg-amber-400 text-white' }
+                : { label: 'Off balance', className: 'bg-rose-400 text-white' }
+        : null
+
     const handleDelete = async (e: React.MouseEvent) => {
         e.preventDefault()
         if (confirm('Are you sure you want to delete this entry?')) {
@@ -56,15 +68,24 @@ const EntryCard = ({ entry }: EntryCardProps) => {
                 />
 
                 <div className="flex-1 min-w-0">
-                    {/* Top row: mood label + date */}
+                    {/* Top row: balance pill (or mood fallback) + date */}
                     <div className="flex items-center justify-between mb-1 gap-2">
-                        <span
-                            className="text-xs font-medium text-forest-muted truncate"
-                            style={{ fontFamily: 'var(--font-dm-sans)' }}
-                        >
-                            {entry.analysis.mood || 'No mood'}
-                            {score ? ` · ${score}` : ''}
-                        </span>
+                        {balancePill && balanceScore !== null ? (
+                            <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tabular-nums truncate ${balancePill.className}`}
+                                style={{ fontFamily: 'var(--font-dm-sans)' }}
+                            >
+                                {balancePill.label} · {balanceScore}
+                            </span>
+                        ) : (
+                            <span
+                                className="text-xs font-medium text-forest-muted truncate"
+                                style={{ fontFamily: 'var(--font-dm-sans)' }}
+                            >
+                                {entry.analysis.mood || 'No mood'}
+                                {score ? ` · ${score}` : ''}
+                            </span>
+                        )}
                         <span
                             className="text-xs text-forest-muted/60 tabular-nums shrink-0"
                             style={{ fontFamily: 'var(--font-dm-sans)' }}

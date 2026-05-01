@@ -5,6 +5,9 @@ export type Analysis = {
     summary: string
     color: string
     sentimentScore: number
+    balanceScore?: number
+    coachingInsight?: string
+    coachingRecommendation?: string
 }
 
 export type Entry = {

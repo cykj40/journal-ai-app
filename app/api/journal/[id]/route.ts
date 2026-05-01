@@ -48,7 +48,10 @@ export async function GET(
                 negative: analysis?.negative || false,
                 summary: analysis?.summary || '',
                 color: analysis?.color || '#0101fe',
-                sentimentScore: analysis ? parseFloat(analysis.sentimentScore) : 0
+                sentimentScore: analysis ? parseFloat(analysis.sentimentScore) : 0,
+                balanceScore: analysis?.balanceScore != null ? parseFloat(analysis.balanceScore) : undefined,
+                coachingInsight: analysis?.coachingInsight ?? undefined,
+                coachingRecommendation: analysis?.coachingRecommendation ?? undefined,
             }
         }
 

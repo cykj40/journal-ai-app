@@ -36,6 +36,9 @@ export const entryAnalysis = pgTable('entry_analysis', {
     summary: text('summary').notNull(),
     color: text('color').default('#0101fe'),
     sentimentScore: text('sentiment_score').notNull(),
+    balanceScore: text('balance_score'),
+    coachingInsight: text('coaching_insight'),
+    coachingRecommendation: text('coaching_recommendation'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })

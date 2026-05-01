@@ -37,7 +37,10 @@ const getEntries = async () => {
             negative: entry.entry_analysis.negative,
             summary: entry.entry_analysis.summary,
             color: entry.entry_analysis.color || '#5C7A52',
-            sentimentScore: parseFloat(entry.entry_analysis.sentimentScore)
+            sentimentScore: parseFloat(entry.entry_analysis.sentimentScore),
+            balanceScore: entry.entry_analysis.balanceScore != null ? parseFloat(entry.entry_analysis.balanceScore) : undefined,
+            coachingInsight: entry.entry_analysis.coachingInsight ?? undefined,
+            coachingRecommendation: entry.entry_analysis.coachingRecommendation ?? undefined,
         } : {
             mood: '',
             subject: '',
