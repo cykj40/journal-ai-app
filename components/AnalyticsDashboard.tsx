@@ -41,14 +41,24 @@ type EntryWithAnalysis = {
     } | null
 }
 
+export type HealthMetricRow = {
+    sleepQuality: string | null
+    stressLevel: string | null
+    energyLevel: string | null
+    exerciseMentioned: boolean | null
+    date: Date | string
+}
+
 interface AnalyticsDashboardProps {
     data: EntryWithAnalysis[]
+    healthMetrics: HealthMetricRow[]
     startDate: Date
     endDate: Date
 }
 
 export default function AnalyticsDashboard({
     data,
+    healthMetrics,
     startDate: initialStartDate,
     endDate: initialEndDate,
 }: AnalyticsDashboardProps) {
@@ -94,6 +104,51 @@ export default function AnalyticsDashboard({
             .sort((a, b) => b.count - a.count)
             .slice(0, 5)
     }, [data])
+
+    const sleepData = useMemo(() => {
+        return healthMetrics
+            .map((m) => ({
+                date: new Date(m.date).toLocaleDateString(),
+                value: m.sleepQuality ? parseFloat(m.sleepQuality) : NaN,
+            }))
+            .filter((p) => Number.isFinite(p.value))
+    }, [healthMetrics])
+
+    const stressData = useMemo(() => {
+        return healthMetrics
+            .map((m) => ({
+                date: new Date(m.date).toLocaleDateString(),
+                value: m.stressLevel ? parseFloat(m.stressLevel) : NaN,
+            }))
+            .filter((p) => Number.isFinite(p.value))
+    }, [healthMetrics])
+
+    const energyData = useMemo(() => {
+        return healthMetrics
+            .map((m) => ({
+                date: new Date(m.date).toLocaleDateString(),
+                value: m.energyLevel ? parseFloat(m.energyLevel) : NaN,
+            }))
+            .filter((p) => Number.isFinite(p.value))
+    }, [healthMetrics])
+
+    const exerciseWeekly = useMemo(() => {
+        const counts: Record<string, number> = {}
+        for (const m of healthMetrics) {
+            if (!m.exerciseMentioned) continue
+            const d = new Date(m.date)
+            const dayOfWeek = d.getDay()
+            const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+            const weekStart = new Date(d)
+            weekStart.setDate(d.getDate() + offsetToMonday)
+            weekStart.setHours(0, 0, 0, 0)
+            const key = weekStart.toLocaleDateString()
+            counts[key] = (counts[key] || 0) + 1
+        }
+        return Object.entries(counts)
+            .map(([week, count]) => ({ week, count }))
+            .sort((a, b) => new Date(a.week).getTime() - new Date(b.week).getTime())
+    }, [healthMetrics])
 
     const chartRefs = {
         sentiment: useRef<HTMLDivElement>(null),
@@ -263,6 +318,88 @@ export default function AnalyticsDashboard({
                                         />
                                     ))}
                                 </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Sleep Quality */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-sage-light/30">
+                    <h2 className="text-xl font-semibold mb-4 text-forest">Sleep Quality</h2>
+                    <div className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={sleepData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#C9D5B8" />
+                                <XAxis dataKey="date" stroke="#3D4A3A" />
+                                <YAxis domain={[1, 5]} stroke="#3D4A3A" />
+                                <Tooltip />
+                                <Line
+                                    type="monotone"
+                                    dataKey="value"
+                                    stroke="#5C7A52"
+                                    strokeWidth={2}
+                                    dot={{ fill: '#5C7A52' }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Stress Level */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-sage-light/30">
+                    <h2 className="text-xl font-semibold mb-4 text-forest">Stress Level</h2>
+                    <div className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={stressData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#C9D5B8" />
+                                <XAxis dataKey="date" stroke="#3D4A3A" />
+                                <YAxis domain={[1, 5]} stroke="#3D4A3A" />
+                                <Tooltip />
+                                <Line
+                                    type="monotone"
+                                    dataKey="value"
+                                    stroke="#5C7A52"
+                                    strokeWidth={2}
+                                    dot={{ fill: '#5C7A52' }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Energy Level */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-sage-light/30">
+                    <h2 className="text-xl font-semibold mb-4 text-forest">Energy Level</h2>
+                    <div className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={energyData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#C9D5B8" />
+                                <XAxis dataKey="date" stroke="#3D4A3A" />
+                                <YAxis domain={[1, 5]} stroke="#3D4A3A" />
+                                <Tooltip />
+                                <Line
+                                    type="monotone"
+                                    dataKey="value"
+                                    stroke="#5C7A52"
+                                    strokeWidth={2}
+                                    dot={{ fill: '#5C7A52' }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Exercise Frequency */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-sage-light/30">
+                    <h2 className="text-xl font-semibold mb-4 text-forest">Exercise Frequency</h2>
+                    <div className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={exerciseWeekly}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#C9D5B8" />
+                                <XAxis dataKey="week" stroke="#3D4A3A" />
+                                <YAxis stroke="#3D4A3A" allowDecimals={false} />
+                                <Tooltip />
+                                <Bar dataKey="count" fill="#5C7A52" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

@@ -1,15 +1,17 @@
 'use client'
 
-import AnalyticsDashboard from '@/components/AnalyticsDashboard'
+import AnalyticsDashboard, { type HealthMetricRow } from '@/components/AnalyticsDashboard'
 
 interface ClientAnalyticsProps {
     initialData: any
+    healthMetrics: HealthMetricRow[]
     startDate: Date
     endDate: Date
 }
 
 export default function ClientAnalytics({
     initialData,
+    healthMetrics,
     startDate: initialStartDate,
     endDate: initialEndDate,
 }: ClientAnalyticsProps) {
@@ -31,6 +33,7 @@ export default function ClientAnalytics({
             </div>
             <AnalyticsDashboard
                 data={initialData}
+                healthMetrics={healthMetrics}
                 startDate={initialStartDate}
                 endDate={initialEndDate}
             />
