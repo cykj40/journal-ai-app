@@ -1,9 +1,9 @@
 import { update } from '@/utils/actions'
-import { analyzeEntry, generateBalanceInsight } from '@/utils/ai'
+import { analyzeEntry } from '@/utils/ai'
 import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries, entryAnalysis, healthMetrics } from '@/utils/schema'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
 export const DELETE = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
@@ -91,21 +91,7 @@ export const PATCH = async (request: Request, { params }: { params: Promise<{ id
         rawExtraction: JSON.stringify(analysis),
     })
 
-    const recentMetrics = await db
-        .select()
-        .from(healthMetrics)
-        .where(eq(healthMetrics.userId, user.id))
-        .orderBy(desc(healthMetrics.createdAt))
-        .limit(7)
-
-    let balance: { score: number; insight: string; recommendation: string } | null = null
-    try {
-        balance = await generateBalanceInsight(recentMetrics as Array<Record<string, unknown>>)
-    } catch (err) {
-        console.error('generateBalanceInsight failed:', err)
-    }
-
-    // Write to entry_analysis after we have the balance fields
+    // Write to entry_analysis after the entry-level analysis finishes
     await db.delete(entryAnalysis).where(eq(entryAnalysis.entryId, entry.id))
 
     const [savedAnalysis] = await db
@@ -119,9 +105,6 @@ export const PATCH = async (request: Request, { params }: { params: Promise<{ id
             summary: analysis.summary,
             color: analysis.color,
             sentimentScore: analysis.sentimentScore.toString(),
-            balanceScore: balance?.score?.toString() ?? null,
-            coachingInsight: balance?.insight ?? null,
-            coachingRecommendation: balance?.recommendation ?? null,
         })
         .returning()
 

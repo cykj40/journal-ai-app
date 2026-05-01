@@ -91,12 +91,18 @@ const JournalEditorPage = () => {
             if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
             savedTimerRef.current = setTimeout(() => setIsSaved(false), 2000)
             // Trigger health analysis after explicit save — fire and forget
-            fetch(`/api/entry/${entryId}`, {
+            const analysisRequest = fetch(`/api/entry/${entryId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ updates: { content: editorContent } }),
+            })
+
+            analysisRequest.then(() => {
+                return fetch(`/api/balance/${entryId}`, {
+                    method: 'POST',
+                })
             }).catch(() => {
-                // silent — analysis is best-effort
+                // silent — analysis and balance insight are best-effort
             })
         } catch (error) {
             console.error('Failed to save entry:', error)
