@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, timestamp, boolean, pgEnum, unique } from 'drizzle-orm/pg-core'
 
 export const journalEntryStatusEnum = pgEnum('journal_entry_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED'])
 
@@ -41,7 +41,9 @@ export const entryAnalysis = pgTable('entry_analysis', {
     coachingRecommendation: text('coaching_recommendation'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
+}, (table) => ({
+    entryIdUnique: unique('entry_analysis_entry_id_unique').on(table.entryId),
+}))
 
 export const healthMetrics = pgTable('health_metrics', {
     id: uuid('id').primaryKey().defaultRandom(),

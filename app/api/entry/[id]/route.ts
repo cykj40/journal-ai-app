@@ -93,9 +93,6 @@ export const PATCH = async (request: Request, { params }: { params: Promise<{ id
         rawExtraction: JSON.stringify(analysis),
     })
 
-    // Write to entry_analysis after the entry-level analysis finishes
-    await db.delete(entryAnalysis).where(eq(entryAnalysis.entryId, entry.id))
-
     const [savedAnalysis] = await db
         .insert(entryAnalysis)
         .values({
@@ -107,6 +104,18 @@ export const PATCH = async (request: Request, { params }: { params: Promise<{ id
             summary: analysis.summary,
             color: analysis.color,
             sentimentScore: analysis.sentimentScore.toString(),
+        })
+        .onConflictDoUpdate({
+            target: entryAnalysis.entryId,
+            set: {
+                mood: analysis.mood,
+                subject: analysis.subject,
+                negative: analysis.negative,
+                summary: analysis.summary,
+                color: analysis.color,
+                sentimentScore: analysis.sentimentScore.toString(),
+                updatedAt: new Date(),
+            },
         })
         .returning()
 

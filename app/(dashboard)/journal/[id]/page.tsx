@@ -97,13 +97,30 @@ const JournalEditorPage = () => {
                 body: JSON.stringify({ updates: { content: editorContent } }),
             })
 
-            analysisRequest.then(() => {
-                return fetch(`/api/balance/${entryId}`, {
-                    method: 'POST',
+            analysisRequest
+                .then(() =>
+                    fetch(`/api/balance/${entryId}`, { method: 'POST' })
+                )
+                .then(async (res) => {
+                    if (!res.ok) return
+                    const { data } = await res.json()
+                    if (!data) return
+                    setAnalysis((prev) => ({
+                        ...(prev ?? {}),
+                        mood: prev?.mood ?? '',
+                        subject: prev?.subject ?? '',
+                        negative: prev?.negative ?? false,
+                        summary: prev?.summary ?? '',
+                        color: prev?.color ?? '#0101fe',
+                        sentimentScore: prev?.sentimentScore ?? 0,
+                        balanceScore: data.balanceScore != null ? parseFloat(data.balanceScore) : undefined,
+                        coachingInsight: data.coachingInsight ?? undefined,
+                        coachingRecommendation: data.coachingRecommendation ?? undefined,
+                    }))
                 })
-            }).catch(() => {
-                // silent — analysis and balance insight are best-effort
-            })
+                .catch(() => {
+                    // silent — balance insight is best-effort
+                })
         } catch (error) {
             console.error('Failed to save entry:', error)
         }
