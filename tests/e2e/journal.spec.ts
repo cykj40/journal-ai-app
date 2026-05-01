@@ -28,12 +28,12 @@ test.describe('journal CRUD', () => {
     await expect(page.getByRole('button', { name: 'Delete', exact: true })).toBeVisible()
   })
 
-  test('editor shows disabled Dictate button', async ({ page }) => {
+  test('editor shows enabled Dictate button', async ({ page }) => {
     await page.locator('button[title="New entry"]').click()
     await expect(page).toHaveURL(/\/journal\/[0-9a-f-]+/, { timeout: 10_000 })
     const dictateBtn = page.getByRole('button', { name: /Dictate/i })
     await expect(dictateBtn).toBeVisible()
-    await expect(dictateBtn).toBeDisabled()
+    await expect(dictateBtn).toBeEnabled()
   })
 
   test('editor shows back navigation link', async ({ page }) => {
