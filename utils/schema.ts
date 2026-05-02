@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, pgEnum, unique } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, timestamp, boolean, pgEnum, unique, index } from 'drizzle-orm/pg-core'
 
 export const journalEntryStatusEnum = pgEnum('journal_entry_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED'])
 
@@ -24,7 +24,11 @@ export const journalEntries = pgTable('journal_entries', {
     healthSnapshot: text('health_snapshot'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
+}, (table) => ({
+    userIdIdx: index('journal_entries_user_id_idx').on(table.userId),
+    createdAtIdx: index('journal_entries_created_at_idx').on(table.createdAt),
+    userCreatedIdx: index('journal_entries_user_created_idx').on(table.userId, table.createdAt),
+}))
 
 export const entryAnalysis = pgTable('entry_analysis', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -43,6 +47,8 @@ export const entryAnalysis = pgTable('entry_analysis', {
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (table) => ({
     entryIdUnique: unique('entry_analysis_entry_id_unique').on(table.entryId),
+    userIdIdx: index('entry_analysis_user_id_idx').on(table.userId),
+    entryIdIdx: index('entry_analysis_entry_id_idx').on(table.entryId),
 }))
 
 export const healthMetrics = pgTable('health_metrics', {
@@ -112,4 +118,28 @@ export const healthMetrics = pgTable('health_metrics', {
     rawExtraction: text('raw_extraction'),
 
     createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+}, (table) => ({
+    userIdIdx: index('health_metrics_user_id_idx').on(table.userId),
+    entryIdIdx: index('health_metrics_entry_id_idx').on(table.entryId),
+    dateIdx: index('health_metrics_date_idx').on(table.date),
+}))
+
+export const jobStatusEnum = pgEnum('job_status', ['pending', 'processing', 'completed', 'failed'])
+export const jobTypeEnum = pgEnum('job_type', ['analyze_entry', 'embed_entry', 'generate_patterns'])
+
+export const jobs = pgTable('jobs', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    type: jobTypeEnum('type').notNull(),
+    status: jobStatusEnum('status').notNull().default('pending'),
+    payload: text('payload').notNull(),
+    result: text('result'),
+    errorMessage: text('error_message'),
+    attempts: text('attempts').default('0'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    processedAt: timestamp('processed_at'),
+}, (table) => ({
+    userIdIdx: index('jobs_user_id_idx').on(table.userId),
+    statusIdx: index('jobs_status_idx').on(table.status),
+    typeIdx: index('jobs_type_idx').on(table.type),
+}))
