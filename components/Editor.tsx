@@ -17,6 +17,7 @@ interface EditorProps {
     isNew?: boolean
     isSaved: boolean
     onSave: () => void
+    onAnalyze: () => void
     onDelete: () => void
 }
 
@@ -37,6 +38,7 @@ const Editor = ({
     isNew = false,
     isSaved,
     onSave,
+    onAnalyze,
     onDelete,
 }: EditorProps) => {
     const editorRef = useRef<RichTextEditorHandle>(null)
@@ -83,6 +85,12 @@ const Editor = ({
                             onStart={startRecording}
                             onStop={stopRecording}
                         />
+                        <button
+                            onClick={onAnalyze}
+                            className="px-4 py-2 rounded-xl border border-[#A8C5A0] text-sm text-[#5C7A52] hover:bg-[#f0f5ee] transition-colors"
+                        >
+                            Analyze
+                        </button>
                         <button
                             onClick={onDelete}
                             className="px-4 py-2 rounded-xl border border-red-300 text-sm text-red-500 hover:bg-red-50 transition-colors"

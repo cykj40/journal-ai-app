@@ -90,41 +90,41 @@ const JournalEditorPage = () => {
             setIsSaved(true)
             if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
             savedTimerRef.current = setTimeout(() => setIsSaved(false), 2000)
-            // Trigger health analysis after explicit save — fire and forget
-            const analysisRequest = fetch(`/api/entry/${entryId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ updates: { content: editorContent } }),
-            })
-
-            analysisRequest
-                .then(() =>
-                    fetch(`/api/balance/${entryId}`, { method: 'POST' })
-                )
-                .then(async (res) => {
-                    if (!res.ok) return
-                    const { data } = await res.json()
-                    if (!data) return
-                    setAnalysis((prev) => ({
-                        ...(prev ?? {}),
-                        mood: prev?.mood ?? '',
-                        subject: prev?.subject ?? '',
-                        negative: prev?.negative ?? false,
-                        summary: prev?.summary ?? '',
-                        color: prev?.color ?? '#0101fe',
-                        sentimentScore: prev?.sentimentScore ?? 0,
-                        balanceScore: data.balanceScore != null ? parseFloat(data.balanceScore) : undefined,
-                        coachingInsight: data.coachingInsight ?? undefined,
-                        coachingRecommendation: data.coachingRecommendation ?? undefined,
-                    }))
-                })
-                .catch(() => {
-                    // silent — balance insight is best-effort
-                })
         } catch (error) {
             console.error('Failed to save entry:', error)
         }
-    }, [editorContent, entryId, saveEntry])
+    }, [editorContent, saveEntry])
+
+    const handleAnalyze = useCallback(() => {
+        fetch(`/api/entry/${entryId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ updates: { content: editorContent } }),
+        })
+            .then(() =>
+                fetch(`/api/balance/${entryId}`, { method: 'POST' })
+            )
+            .then(async (res) => {
+                if (!res.ok) return
+                const { data } = await res.json()
+                if (!data) return
+                setAnalysis((prev) => ({
+                    ...(prev ?? {}),
+                    mood: prev?.mood ?? '',
+                    subject: prev?.subject ?? '',
+                    negative: prev?.negative ?? false,
+                    summary: prev?.summary ?? '',
+                    color: prev?.color ?? '#0101fe',
+                    sentimentScore: prev?.sentimentScore ?? 0,
+                    balanceScore: data.balanceScore != null ? parseFloat(data.balanceScore) : undefined,
+                    coachingInsight: data.coachingInsight ?? undefined,
+                    coachingRecommendation: data.coachingRecommendation ?? undefined,
+                }))
+            })
+            .catch(() => {
+                // silent — balance insight is best-effort
+            })
+    }, [editorContent, entryId])
 
     useEffect(() => {
         return () => {
@@ -212,6 +212,7 @@ const JournalEditorPage = () => {
                         onSave={() => {
                             void handleSave()
                         }}
+                        onAnalyze={handleAnalyze}
                         onDelete={handleDelete}
                     />
                 </div>
