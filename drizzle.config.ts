@@ -4,7 +4,7 @@ dotenv.config({ path: '.env.local' });
 
 export default defineConfig({
     dialect: "postgresql",
-    schema: ["./utils/schema.ts", "./utils/better-auth-schema.ts"],
+    schema: ["./utils/schema.ts", "./utils/better-auth-schema.ts", "./utils/vector-schema.ts"],
     out: "./drizzle",
     dbCredentials: {
         url: process.env.DATABASE_URL!, // Use 'url' instead of 'connectionString'

@@ -172,12 +172,15 @@ ${entry.content}`,
 
 export const qa = async (
     question: string,
-    entries: { id: string; content: string; createdAt: Date }[]
+    entries: { id: string; content: string; createdAt: Date }[],
+    similarEntries?: string[]
 ): Promise<string> => {
-    const recent = entries.slice(-20)
-    const context = recent
-        .map(e => `[${e.createdAt.toISOString().slice(0, 10)}]\n${e.content}`)
-        .join('\n\n---\n\n')
+    const context = similarEntries && similarEntries.length > 0
+        ? similarEntries.join('\n\n---\n\n')
+        : entries
+            .slice(-20)
+            .map(e => `[${e.createdAt.toISOString().slice(0, 10)}]\n${e.content}`)
+            .join('\n\n---\n\n')
 
     const message = await anthropic.messages.create({
         model: 'claude-sonnet-4-5',

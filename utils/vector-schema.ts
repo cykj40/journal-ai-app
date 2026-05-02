@@ -5,5 +5,5 @@ export const vectorEntries = pgTable('vector_entries', {
     id: text('id').primaryKey(),
     entryId: uuid('entry_id').references(() => journalEntries.id, { onDelete: 'cascade' }),
     content: text('content').notNull(),
-    embedding: vector('embedding', { dimensions: 256 }).notNull(),
+    embedding: vector('embedding', { dimensions: 1536 }).notNull(),
 });

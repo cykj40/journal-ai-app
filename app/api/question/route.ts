@@ -1,4 +1,5 @@
 import { qa } from '@/utils/ai'
+import { findSimilarEntries } from '@/utils/embeddings'
 import { getCurrentAppUser } from '@/utils/auth'
 import { db } from '@/utils/db'
 import { journalEntries } from '@/utils/schema'
@@ -9,12 +10,21 @@ export const POST = async (request: Request) => {
     const { question } = await request.json()
     const user = await getCurrentAppUser()
 
-    const entries = await db
-        .select()
-        .from(journalEntries)
-        .where(eq(journalEntries.userId, user.id))
+    let similar: string[] = []
+    try {
+        similar = await findSimilarEntries(question, user.id, 10)
+    } catch {
+        similar = []
+    }
 
-    const answer = await qa(question, entries)
+    const entries = similar.length === 0
+        ? await db
+            .select()
+            .from(journalEntries)
+            .where(eq(journalEntries.userId, user.id))
+        : []
+
+    const answer = await qa(question, entries, similar)
 
     return NextResponse.json({ data: answer })
 }

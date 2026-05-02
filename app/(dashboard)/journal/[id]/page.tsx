@@ -120,6 +120,7 @@ const JournalEditorPage = () => {
                     coachingInsight: data.coachingInsight ?? undefined,
                     coachingRecommendation: data.coachingRecommendation ?? undefined,
                 }))
+                fetch(`/api/entry/${entryId}/embed`, { method: 'POST' }).catch(() => {})
             })
             .catch(() => {
                 // silent — balance insight is best-effort
