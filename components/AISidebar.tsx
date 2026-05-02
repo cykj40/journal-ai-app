@@ -128,6 +128,7 @@ const AISidebar = ({ analysis, healthSnapshot }: AISidebarProps) => {
 
                         {analysis.coachingInsight && analysis.coachingRecommendation && (
                             <div className="pt-2 space-y-2 border-t border-gray-100">
+                                <p className="text-xs text-gray-600 leading-relaxed">{analysis.coachingInsight}</p>
                                 <div className="flex gap-1.5 items-start bg-sage-light/30 rounded-lg px-2.5 py-2">
                                     <span className="text-sage text-xs">→</span>
                                     <p className="text-xs text-forest leading-relaxed">{analysis.coachingRecommendation}</p>
