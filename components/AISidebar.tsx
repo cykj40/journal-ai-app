@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { type Analysis, type HealthSnapshot } from '@/utils/types'
 
 interface AISidebarProps {
@@ -60,32 +59,8 @@ function HealthRow({
 }
 
 const AISidebar = ({ analysis, healthSnapshot }: AISidebarProps) => {
-    const [question, setQuestion] = useState('')
-    const [answer, setAnswer] = useState<string | null>(null)
-    const [asking, setAsking] = useState(false)
-
     const hasAnalysis = analysis.mood || analysis.subject || analysis.sentimentScore !== 0
     const snapshot = parseSnapshot(healthSnapshot)
-
-    const handleAsk = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!question.trim() || asking) return
-        setAsking(true)
-        setAnswer(null)
-        try {
-            const res = await fetch('/api/question', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question }),
-            })
-            const { data } = await res.json()
-            setAnswer(data)
-        } catch {
-            setAnswer('Something went wrong. Try again.')
-        } finally {
-            setAsking(false)
-        }
-    }
 
     return (
         <div className="h-full flex flex-col gap-6 px-5 py-6 text-sm">
@@ -195,56 +170,6 @@ const AISidebar = ({ analysis, healthSnapshot }: AISidebarProps) => {
                         Coming soon
                     </button>
                 </div>
-            </section>
-
-            <div className="h-px bg-gray-100 dark:bg-zinc-800" />
-
-            {/* ── Section 3: Ask your journal ── */}
-            <section className="flex-1 flex flex-col">
-                <SectionHeader>Ask your journal</SectionHeader>
-
-                <form onSubmit={handleAsk} className="flex flex-col gap-2">
-                    <textarea
-                        value={question}
-                        onChange={e => setQuestion(e.target.value)}
-                        onKeyDown={e => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault()
-                                handleAsk(e as unknown as React.FormEvent)
-                            }
-                        }}
-                        placeholder="How has my energy been this week?"
-                        rows={2}
-                        className="w-full resize-none rounded-lg border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-700 placeholder:text-gray-400 dark:placeholder:text-zinc-600"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!question.trim() || asking}
-                        className="self-end px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    >
-                        {asking ? 'Thinking…' : 'Ask'}
-                    </button>
-                </form>
-
-                {answer && (
-                    <div className="mt-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 px-3 py-3">
-                        <div className="flex items-center justify-between mb-1.5">
-                            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">
-                                AI Response:
-                            </h3>
-                            <button
-                                type="button"
-                                onClick={() => { setAnswer(null); setQuestion('') }}
-                                className="text-[10px] font-medium text-violet-500 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
-                            >
-                                Clear
-                            </button>
-                        </div>
-                        <p className="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                            {answer}
-                        </p>
-                    </div>
-                )}
             </section>
         </div>
     )

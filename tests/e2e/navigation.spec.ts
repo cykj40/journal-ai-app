@@ -4,7 +4,7 @@ import { signIn, clearSession } from './helpers/auth'
 // Sidebar nav links (desktop, Sidebar.tsx) and bottom tab links (mobile, BottomNav.tsx):
 // "Journal"   → /journal
 // "Analytics" → /analytics
-// "History"   → /history
+// "Patterns"  → /patterns
 
 test.describe('navigation', () => {
   test.beforeEach(async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe('navigation', () => {
     await expect(page.getByText('Health Journal AI').first()).toBeVisible()
     await expect(page.getByRole('link', { name: 'Journal' }).first()).toBeVisible()
     await expect(page.getByRole('link', { name: 'Analytics' }).first()).toBeVisible()
-    await expect(page.getByRole('link', { name: 'History' }).first()).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Patterns' }).first()).toBeVisible()
   })
 
   test('Analytics link navigates to /analytics', async ({ page }) => {
@@ -28,9 +28,9 @@ test.describe('navigation', () => {
     await expect(page.getByRole('heading', { name: 'Analytics' })).toBeVisible()
   })
 
-  test('History link navigates to /history', async ({ page }) => {
-    await page.getByRole('link', { name: 'History' }).first().click()
-    await expect(page).toHaveURL(/\/history/)
+  test('Patterns link navigates to /patterns', async ({ page }) => {
+    await page.getByRole('link', { name: 'Patterns' }).first().click()
+    await expect(page).toHaveURL(/\/patterns/)
   })
 
   test('Journal link navigates to /journal', async ({ page }) => {
