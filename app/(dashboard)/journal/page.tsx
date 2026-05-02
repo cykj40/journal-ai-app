@@ -6,6 +6,7 @@ import { eq, and, gte } from 'drizzle-orm'
 import NewEntry from '@/components/NewEntry'
 import Link from 'next/link'
 import EntryCard from '@/components/EntryCard'
+import JournalAskAI from '@/components/JournalAskAI'
 
 const getEntries = async () => {
     const user = await getCurrentAppUser()
@@ -107,6 +108,8 @@ const JournalPage = async () => {
                     {dateLabel}
                 </p>
             </div>
+
+            <JournalAskAI />
 
             {/* Month section header */}
             <div className="flex items-center gap-3 mb-5">
